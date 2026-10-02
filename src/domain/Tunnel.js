@@ -14,7 +14,13 @@ export class Tunnel {
   /**@type {Vector3[]} */
   points;
 
-  constructor(from, to, points = [], id = null) {
+  /**
+   * @param {Port} from
+   * @param {Port} to
+   * @param {Vector3[]} points
+   * @param {String|null} id
+   */
+  constructor(from, to, points = [], id) {
     this.id = id ?? UUID.v4();
     this.from = from;
     this.to = to;

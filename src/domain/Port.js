@@ -4,7 +4,9 @@ import { MetroNode } from "./MetroNode";
 import * as UUID from "uuid";
 /**
  * Port of node, to which the tunnels would be connected
- * stors relation with its node
+ * Stores relation with its node
+ *
+ * Port's global x axis is considered direction of port output
  */
 export class Port {
   id;
@@ -24,8 +26,8 @@ export class Port {
   constructor(
     localPosition = new Vector3(),
     localRotation = new Euler(0, 0, 0),
-    id = null,
     node = null,
+    id = null,
   ) {
     this.id = id ?? UUID.v4();
     this.localPosition = localPosition;
@@ -52,8 +54,8 @@ export class Port {
     return new Port(
       new Vector3().fromArray(data.localPosition),
       new Euler().fromArray(data.localRotation),
-      data.id,
       node,
+      data.id,
     );
   }
 }

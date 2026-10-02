@@ -28,7 +28,7 @@ export class Metro {
   }
   static fromJSON(data) {
     // port depends on its node, tunnel depends on port from and to
-    const nodes = data.nodes.map((node) => MetroNode.fromJSON(data.nodes));
+    const nodes = data.nodes.map((node) => MetroNode.fromJSON(node));
     const ports = data.ports.map((port) => Port.fromJSON(port, nodes));
     const tunnels = data.tunnels.map((tunnel) =>
       Tunnel.fromJSON(tunnel, ports),
