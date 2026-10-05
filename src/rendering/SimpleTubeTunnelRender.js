@@ -19,6 +19,8 @@ export class SimpleTubeTunnelRenderer {
     const material = new THREE.MeshBasicMaterial({
       color: new THREE.Color().setRGB(0.5, 0.5, 0.5),
       side: THREE.BackSide,
+      wireframe: true,
+      м,
     });
     for (const tunnel of metro.tunnels) {
       const curves = createTunnelCurves(tunnel, 0.3);

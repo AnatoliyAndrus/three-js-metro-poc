@@ -12,15 +12,20 @@ export class MetroNode {
   position;
   /** @type {Euler} **/
   rotation;
+  // type of node: station or junction
+  /** @type {String} */
+  type;
 
   constructor(
     position = new Vector3(),
     rotation = new Euler(0, 0, 0),
-    id = null,
+    type = "station",
+    id,
   ) {
     this.id = id ?? UUID.v4();
     this.position = position;
     this.rotation = rotation;
+    this.type = type;
   }
 
   toJSON() {
@@ -28,6 +33,7 @@ export class MetroNode {
       id: this.id,
       position: this.position.toArray(),
       rotation: this.rotation.toArray(),
+      type: this.type,
     };
   }
 
@@ -35,6 +41,7 @@ export class MetroNode {
     return new MetroNode(
       new Vector3().fromArray(data.position),
       new Euler().fromArray(data.rotation),
+      data.type,
       data.id,
     );
   }
