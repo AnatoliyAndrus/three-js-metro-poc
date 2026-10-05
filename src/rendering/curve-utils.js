@@ -38,7 +38,7 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
 
     if (i === tunnel.points.length) {
       endPoint = toGlobalPosition;
-      endDirection = toDirection;
+      endDirection = toDirection.negate();
     } else {
       endPoint = tunnel.points[i];
       let nextPoint =

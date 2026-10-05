@@ -16,13 +16,15 @@
       "id": "e0850068-c0e9-4957-97fe-b0fbe7cc10fa",
       "localPosition": [1, 0, -1],
       "localRotation": [0, 0, 0, "XYZ"],
-      "nodeId": "96d2b17c-6bff-4bc0-8b86-9666a24d33fd"
+      "nodeId": "96d2b17c-6bff-4bc0-8b86-9666a24d33fd",
+      "type": "out"
     },
     {
       "id": "c73a6c7b-44ae-4b1d-ab03-de023ed30cab",
       "localPosition": [-1, 0, -1],
-      "localRotation": [0, 3.141592653589793, 0, "XYZ"],
-      "nodeId": "b90bee5b-ce6f-439e-a50a-f1e8ef12e929"
+      "localRotation": [0, 0, 0, "XYZ"],
+      "nodeId": "b90bee5b-ce6f-439e-a50a-f1e8ef12e929",
+      "type": "in"
     }
   ],
   "tunnels": [

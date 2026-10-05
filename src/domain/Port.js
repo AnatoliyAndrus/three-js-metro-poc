@@ -16,23 +16,28 @@ export class Port {
   localRotation;
   /** @type {MetroNode} */
   node;
+  /** @type {string} type of port, in or out */
+  type;
 
   /**
    * @param {Vector3} position
    * @param {Euler} rotation
    * @param {String|null} id
    * @param {MetroNode|null} node
+   * @param {String} type
    */
   constructor(
     localPosition = new Vector3(),
     localRotation = new Euler(0, 0, 0),
     node = null,
+    type = "in",
     id = null,
   ) {
     this.id = id ?? UUID.v4();
     this.localPosition = localPosition;
     this.localRotation = localRotation;
     this.node = node;
+    this.type = type;
   }
 
   toJSON() {
@@ -41,6 +46,7 @@ export class Port {
       localPosition: this.localPosition.toArray(),
       localRotation: this.localRotation.toArray(),
       nodeId: this.node.id,
+      type: this.type,
     };
   }
 
@@ -55,6 +61,7 @@ export class Port {
       new Vector3().fromArray(data.localPosition),
       new Euler().fromArray(data.localRotation),
       node,
+      data.type,
       data.id,
     );
   }

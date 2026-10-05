@@ -18,6 +18,7 @@ export class SimpleTubeTunnelRenderer {
   render(metro) {
     const material = new THREE.MeshBasicMaterial({
       color: new THREE.Color().setRGB(0.5, 0.5, 0.5),
+      side: THREE.BackSide,
     });
     for (const tunnel of metro.tunnels) {
       const curves = createTunnelCurves(tunnel, 0.3);
@@ -25,7 +26,7 @@ export class SimpleTubeTunnelRenderer {
       for (const curve of curves) {
         const geometry = new THREE.TubeGeometry(curve, 64, 1, 8);
         const mesh = new THREE.Mesh(geometry, material);
-        console.log(mesh.position);
+
         curveMeshes.push(mesh);
         this.#scene.add(mesh);
       }
