@@ -8,6 +8,7 @@ import { Tunnel } from "./src/domain/Tunnel";
 import { Vector3 } from "three";
 import { Euler } from "three";
 import { SimpleTubeTunnelRenderer } from "./src/rendering/SimpleTubeTunnelRender";
+import { TunnelSegmentBuilder } from "./src/rendering/TunnelSegmentBuilder";
 
 const container = document.querySelector(".sceneContainer");
 
@@ -32,43 +33,54 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 
-//creating our own metro
-const station1 = new MetroNode(new Vector3(0, 0, 0));
-const station2 = new MetroNode(new Vector3(100, 0, 10));
+// //creating our own metro
+// const station1 = new MetroNode(new Vector3(0, 0, 0));
+// const station2 = new MetroNode(new Vector3(100, 0, 10));
 
-const station1Port = new Port(
-  new Vector3(1, 0, -1),
-  new Euler(0, -0, 0),
-  station1,
-  "out",
-);
-const station2Port = new Port(
-  new Vector3(-1, 0, -1),
-  new Euler(0, 0, 0),
-  station2,
-  "in",
-);
+// const station1Port = new Port(
+//   new Vector3(1, 0, -1),
+//   new Euler(0, -0, 0),
+//   station1,
+//   "out",
+// );
+// const station2Port = new Port(
+//   new Vector3(-1, 0, -1),
+//   new Euler(0, 0, 0),
+//   station2,
+//   "in",
+// );
 
-const points = [
-  new Vector3(10, 0, 3),
-  new Vector3(20, 0.5, 10),
-  new Vector3(40, 1, 13),
-  new Vector3(50, 1, 15),
-  new Vector3(70, 0, 7),
-];
-const tunnel = new Tunnel(station1Port, station2Port, points);
+// const points = [
+//   new Vector3(10, 0, 3),
+//   new Vector3(20, 0.5, 10),
+//   new Vector3(40, 1, 13),
+//   new Vector3(50, 1, 15),
+//   new Vector3(70, 0, 7),
+// ];
+// const tunnel = new Tunnel(station1Port, station2Port, points);
 
-const metro = new Metro(
-  [station1, station2],
-  [station1Port, station2Port],
-  [tunnel],
-);
-console.log(metro);
-console.log(JSON.stringify(metro));
+// const metro = new Metro(
+//   [station1, station2],
+//   [station1Port, station2Port],
+//   [tunnel],
+// );
+// console.log(metro);
+// console.log(JSON.stringify(metro));
 
-// //importing metro from json file
-// import data from "./resources/tunnel-points-test.json";
-// const metro = Metro.fromJSON(data);
+//importing metro from json file
+import data from "./resources/tunnel-points-test.json";
+const metro = Metro.fromJSON(data);
 
-const tunnelRender = new SimpleTubeTunnelRenderer(scene);
+import profileExamples from "./resources/tunnel-profile-examples.json";
+import { Vector2 } from "three";
+const tunnelBuilder = new TunnelSegmentBuilder();
+const profile = [];
+for (let i = 0; i < profileExamples[0].length / 2; i++) {
+  profile.push(
+    new Vector2(profileExamples[0][i * 2], profileExamples[0][i * 2 + 1]),
+  );
+}
+tunnelBuilder.shellProfile = profile;
+tunnelBuilder.shellResolution = 1;
+const tunnelRender = new SimpleTubeTunnelRenderer(scene, tunnelBuilder);
 tunnelRender.render(metro);

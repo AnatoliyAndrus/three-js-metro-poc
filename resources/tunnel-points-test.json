@@ -1,41 +1,42 @@
 {
   "nodes": [
     {
-      "id": "96d2b17c-6bff-4bc0-8b86-9666a24d33fd",
+      "id": "939a5ba2-825b-443a-a0bd-81ac1cf86522",
       "position": [0, 0, 0],
-      "rotation": [0, 0, 0, "XYZ"]
+      "rotation": [0, 0, 0, "XYZ"],
+      "type": "station"
     },
     {
-      "id": "b90bee5b-ce6f-439e-a50a-f1e8ef12e929",
+      "id": "66838ded-dfc9-4495-b9b0-51a8d952d97a",
       "position": [100, 0, 10],
-      "rotation": [0, 0, 0, "XYZ"]
+      "rotation": [0, 0, 0, "XYZ"],
+      "type": "station"
     }
   ],
   "ports": [
     {
-      "id": "e0850068-c0e9-4957-97fe-b0fbe7cc10fa",
+      "id": "27767c6c-fc0c-4958-8f6f-1fd2334687c0",
       "localPosition": [1, 0, -1],
       "localRotation": [0, 0, 0, "XYZ"],
-      "nodeId": "96d2b17c-6bff-4bc0-8b86-9666a24d33fd",
+      "nodeId": "939a5ba2-825b-443a-a0bd-81ac1cf86522",
       "type": "out"
     },
     {
-      "id": "c73a6c7b-44ae-4b1d-ab03-de023ed30cab",
+      "id": "e4417dd3-1ec9-47e4-acb4-1ac2ab3c1d7e",
       "localPosition": [-1, 0, -1],
       "localRotation": [0, 0, 0, "XYZ"],
-      "nodeId": "b90bee5b-ce6f-439e-a50a-f1e8ef12e929",
+      "nodeId": "66838ded-dfc9-4495-b9b0-51a8d952d97a",
       "type": "in"
     }
   ],
   "tunnels": [
     {
-      "id": null,
-      "fromId": "e0850068-c0e9-4957-97fe-b0fbe7cc10fa",
-      "toId": "c73a6c7b-44ae-4b1d-ab03-de023ed30cab",
+      "fromId": "27767c6c-fc0c-4958-8f6f-1fd2334687c0",
+      "toId": "e4417dd3-1ec9-47e4-acb4-1ac2ab3c1d7e",
       "points": [
         [10, 0, 3],
         [20, 0.5, 10],
-        [40, 10, 13],
+        [40, 1, 13],
         [50, 1, 15],
         [70, 0, 7]
       ]
