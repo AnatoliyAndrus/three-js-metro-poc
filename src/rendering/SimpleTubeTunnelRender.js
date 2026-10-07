@@ -1,33 +1,34 @@
 import * as THREE from "three";
 import { Metro } from "../domain/Metro";
 import { createTunnelCurves } from "./curve-utils";
-import { TunnelSegmentBuilder } from "./TunnelSegmentBuilder";
+import { TunnelSegmentFactory } from "./TunnelSegmentFactory";
 
 export class SimpleTubeTunnelRenderer {
   #scene;
   #tunnels = [];
-  #tunnelBuilder;
+  #tunnelSegmentFactory;
 
   /**
    *
    * @param {THREE.Scene} scene
-   * @param {TunnelSegmentBuilder} tunnelBuilder
+   * @param {TunnelSegmentFactory} tunnelSegmentFactory
    */
-  constructor(scene, tunnelBuilder) {
+  constructor(scene, tunnelSegmentFactory) {
     this.#scene = scene;
-    this.tunnelBuilder = tunnelBuilder;
+    this.#tunnelSegmentFactory = tunnelSegmentFactory;
   }
 
   render(metro) {
     const material = new THREE.MeshBasicMaterial({
       color: new THREE.Color().setRGB(0.5, 0.5, 0.5),
       wireframe: true,
+      side: THREE.BackSide,
     });
     for (const tunnel of metro.tunnels) {
       const curves = createTunnelCurves(tunnel, 0.3);
       const curveMeshes = [];
       for (const curve of curves) {
-        const geometry = this.tunnelBuilder.buildShellGeometry(curve);
+        const geometry = this.#tunnelSegmentFactory.createShellGeometry(curve);
         const mesh = new THREE.Mesh(geometry, material);
 
         curveMeshes.push(mesh);

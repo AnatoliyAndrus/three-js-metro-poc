@@ -7,8 +7,9 @@ import { Port } from "./src/domain/Port";
 import { Tunnel } from "./src/domain/Tunnel";
 import { Vector3 } from "three";
 import { Euler } from "three";
+
 import { SimpleTubeTunnelRenderer } from "./src/rendering/SimpleTubeTunnelRender";
-import { TunnelSegmentBuilder } from "./src/rendering/TunnelSegmentBuilder";
+import { TunnelSegmentFactory } from "./src/rendering/TunnelSegmentFactory";
 
 const container = document.querySelector(".sceneContainer");
 
@@ -73,14 +74,16 @@ const metro = Metro.fromJSON(data);
 
 import profileExamples from "./resources/tunnel-profile-examples.json";
 import { Vector2 } from "three";
-const tunnelBuilder = new TunnelSegmentBuilder();
+
+const tunnelSegmentFactory = new TunnelSegmentFactory();
 const profile = [];
 for (let i = 0; i < profileExamples[0].length / 2; i++) {
   profile.push(
     new Vector2(profileExamples[0][i * 2], profileExamples[0][i * 2 + 1]),
   );
 }
-tunnelBuilder.shellProfile = profile;
-tunnelBuilder.shellResolution = 1;
-const tunnelRender = new SimpleTubeTunnelRenderer(scene, tunnelBuilder);
+tunnelSegmentFactory.shellProfile = profile;
+tunnelSegmentFactory.shellResolution = 1;
+
+const tunnelRender = new SimpleTubeTunnelRenderer(scene, tunnelSegmentFactory);
 tunnelRender.render(metro);
