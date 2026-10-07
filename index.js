@@ -1,12 +1,12 @@
 "use strict";
+import data from "./src/examples/tunnel-points-test.json";
+import { testFactory } from "./src/examples/tunnel-segment-factory-example";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Metro } from "./src/domain/Metro";
 import { MetroNode } from "./src/domain/MetroNode";
 import { Port } from "./src/domain/Port";
 import { Tunnel } from "./src/domain/Tunnel";
-import { Vector3 } from "three";
-import { Euler } from "three";
 
 import { SimpleTubeTunnelRenderer } from "./src/rendering/SimpleTubeTunnelRender";
 import { TunnelSegmentFactory } from "./src/rendering/TunnelSegmentFactory";
@@ -69,21 +69,9 @@ renderer.setAnimationLoop(() => {
 // console.log(JSON.stringify(metro));
 
 //importing metro from json file
-import data from "./resources/tunnel-points-test.json";
 const metro = Metro.fromJSON(data);
 
-import profileExamples from "./resources/tunnel-profile-examples.json";
-import { Vector2 } from "three";
-
-const tunnelSegmentFactory = new TunnelSegmentFactory();
-const profile = [];
-for (let i = 0; i < profileExamples[0].length / 2; i++) {
-  profile.push(
-    new Vector2(profileExamples[0][i * 2], profileExamples[0][i * 2 + 1]),
-  );
-}
-tunnelSegmentFactory.shellProfile = profile;
-tunnelSegmentFactory.shellResolution = 1;
+const tunnelSegmentFactory = new testFactory();
 
 const tunnelRender = new SimpleTubeTunnelRenderer(scene, tunnelSegmentFactory);
 tunnelRender.render(metro);
