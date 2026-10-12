@@ -88,7 +88,7 @@ export function getPortGlobalPosition(port) {
 /**
  *
  * @param {Port} port
- * @returns {Vector3} direction vector of port is considered its x axis
+ * @returns {Vector3} direction vector of port is considered its 'x' axis
  */
 export function getPortDirectionVector(port) {
   return new Vector3(1, 0, 0)
@@ -184,11 +184,12 @@ export function createGeometryAlongCurve(
 }
 
 /**
+ * Function that creates basis vectors for profile transformations
  * @param {number} u
  * @param {Curve} curve
- * @returns {{point: Vector3, tangent: Vector3, side: Vector3, localUp: Vector3}}
+ * @returns {{point: Vector3, tangent: Vector3, side: Vector3, localUp: Vector3}} side - vector perpendicular to tangent, local and global 'up' vectors, is considered 'x' axis; localUp - considered 'y' axis; tangent - considered 'z' axis; point - point on curve, (0, 0, 0) in this space
  */
-export function getCurveFrame(u, curve) {
+function getCurveFrame(u, curve) {
   const point = curve.getPointAt(u);
 
   // tangent, localUp and side are basis used to transform local coordinate of point according to the curve
@@ -201,7 +202,7 @@ export function getCurveFrame(u, curve) {
 }
 
 /**
- *
+ * Transforms local profile points of 2d space into global 3d space according to position on the curve
  * @param {Vector2[]} localPoints
  * @param {number} u
  * @param {Curve} curve
@@ -224,7 +225,8 @@ export function getProfileGlobalPoints(localPoints, u, curve) {
 }
 
 /**
- *
+ * Creates InstancedMesh copies of geometry along the curve, rotated accordingly
+ * Used, for example, for making sleepers in tunnel
  * @param {Vector2} profilePoint point where instances will be placed
  * @param {BufferGeometry} geometry
  * @param {Material} material
