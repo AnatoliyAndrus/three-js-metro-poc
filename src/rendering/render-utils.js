@@ -97,10 +97,13 @@ export function getPortDirectionVector(port) {
 
 /**
  * Function that creates geometry along curve, such as tunnel shell, floor or rail.
+ * Supports creation of geometries that cover only part of curve length, using startU and endU
  * @param {Vector2[]} profile set of points that define profile. May be asymmetric.
  * @param {number} resolution number of profiles per unit of length
  * @param {Curve} curve
  * @param {boolean} fullTube whether first and last points of geometry are connected
+ * @param {number} startU where from on curve geometry starts
+ * @param {number} endU where geometry stretches to
  * @returns {BufferGeometry}
  */
 export function createGeometryAlongCurve(
@@ -108,8 +111,11 @@ export function createGeometryAlongCurve(
   resolution,
   curve,
   fullTube = false,
+  startU = 0,
+  endU = 1.0,
 ) {
-  const numberOfProfiles = Math.ceil(resolution * curve.getLength()) + 1;
+  const curvePartLength = curve.getLength() * (endU - startU);
+  const numberOfProfiles = Math.ceil(resolution * curvePartLength) + 1;
 
   const geometry = new BufferGeometry();
   const positionAttribute = [];
@@ -120,7 +126,8 @@ export function createGeometryAlongCurve(
     return i * profile.length + j;
   };
   for (let i = 0; i < numberOfProfiles; i++) {
-    const currentU = i / (numberOfProfiles - 1);
+    // for i == 0 currentU == startU, for i == (numberOfProfiles - 1) currentU == endU
+    const currentU = (i / (numberOfProfiles - 1)) * (endU - startU) + startU;
     const profileGlobalPoints = getProfileGlobalPoints(
       profile,
       currentU,
