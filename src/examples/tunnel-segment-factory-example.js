@@ -1,4 +1,4 @@
-import { BoxGeometry, Color, Vector2 } from "three";
+import { BackSide, BoxGeometry, Color, Vector2 } from "three";
 import { TunnelSegmentFactory } from "../rendering/TunnelSegmentFactory";
 import { MeshBasicMaterial } from "three";
 
@@ -17,6 +17,7 @@ export function testFactory() {
     resolution: 1,
     material: new MeshBasicMaterial({
       color: new Color().setRGB(0.3, 0.3, 0.5),
+      side: BackSide,
       wireframe: true,
     }),
   };

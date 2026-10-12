@@ -7,6 +7,7 @@ import {
   BufferAttribute,
   Matrix4,
   InstancedMesh,
+  ShapeUtils,
 } from "three";
 import { Tunnel } from "../domain/Tunnel";
 import { Port } from "../domain/Port";
@@ -101,7 +102,8 @@ export function getPortDirectionVector(port) {
  * @param {Vector2[]} profile set of points that define profile. May be asymmetric.
  * @param {number} resolution number of profiles per unit of length
  * @param {Curve} curve
- * @param {boolean} fullTube whether first and last points of geometry are connected
+ * @param {boolean} fullTube whether first and last points of profiles are connected
+ * @param {boolean} sealedTube whether whether first and last profiles are sealed
  * @param {number} startU where from on curve geometry starts
  * @param {number} endU where geometry stretches to
  * @returns {BufferGeometry}
@@ -111,6 +113,7 @@ export function createGeometryAlongCurve(
   resolution,
   curve,
   fullTube = false,
+  sealedTube = false,
   startU = 0,
   endU = 1.0,
 ) {
@@ -155,6 +158,22 @@ export function createGeometryAlongCurve(
       }
     }
   }
+
+  if (sealedTube) {
+    const sealIndex = ShapeUtils.triangulateShape(profile, []);
+
+    const lastProfileOffset = profile.length * (numberOfProfiles - 1);
+    for (let polygon of sealIndex) {
+      index.push(polygon[0], polygon[2], polygon[1]);
+      console.log(polygon[0] + lastProfileOffset);
+      index.push(
+        polygon[0] + lastProfileOffset,
+        polygon[1] + lastProfileOffset,
+        polygon[2] + lastProfileOffset,
+      );
+    }
+  }
+
   geometry.setAttribute(
     "position",
     new BufferAttribute(new Float32Array(positionAttribute), 3),
