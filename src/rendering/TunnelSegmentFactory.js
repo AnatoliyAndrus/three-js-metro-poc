@@ -147,6 +147,7 @@ export class TunnelSegmentFactory {
     tunnelSegment.add(floor);
     tunnelSegment.add(rails[0], rails[1]);
     tunnelSegment.add(sleepers);
+
     return tunnelSegment;
   }
 }

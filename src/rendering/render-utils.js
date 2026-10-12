@@ -12,10 +12,10 @@ import {
 import { Tunnel } from "../domain/Tunnel";
 import { Port } from "../domain/Port";
 /**
- * Creates set of Bezier curve
+ * Creates array of curves and their positions
  * @param {Tunnel} tunnel
  * @param {number} curvature parameter to set distance from point to control point, defined as percent of distance between start and end point of curve, example, 0.1 = 10% of distance
- * @returns {CubicBezierCurve3[]} set of curves that define this tunnel
+ * @returns {[{curve: CubicBezierCurve3, position: Vector3}]}
  */
 export function createTunnelCurves(tunnel, curvature = 0.3) {
   const curves = [];
@@ -31,29 +31,29 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
   //for example, if there are no points at all, this shall make one iteration, drawing line between 'from' and 'to' ports
   for (let i = 0; i < tunnel.points.length + 1; i++) {
     //start and end of the line. Might have port position
-    let startPoint;
-    let endPoint;
+    let startPoint = new Vector3();
+    let endPoint = new Vector3();
     //normalized vectors which define where control points will be
-    let startDirection;
-    let endDirection;
+    let startDirection = new Vector3();
+    let endDirection = new Vector3();
 
     if (i === 0) {
-      startPoint = fromGlobalPosition;
-      startDirection = fromDirection;
+      startPoint.copy(fromGlobalPosition);
+      startDirection.copy(fromDirection);
     } else {
-      startPoint = tunnel.points[i - 1];
-      startDirection = prevEndDirection.clone().negate();
+      startPoint.copy(tunnel.points[i - 1]);
+      startDirection.copy(prevEndDirection).negate();
     }
 
     if (i === tunnel.points.length) {
-      endPoint = toGlobalPosition;
-      endDirection = toDirection.negate();
+      endPoint.copy(toGlobalPosition);
+      endDirection.copy(toDirection).negate();
     } else {
-      endPoint = tunnel.points[i];
+      endPoint.copy(tunnel.points[i]);
       let nextPoint =
         i === tunnel.points.length - 1
-          ? toGlobalPosition
-          : tunnel.points[i + 1];
+          ? toGlobalPosition.clone()
+          : tunnel.points[i + 1].clone();
       endDirection = startPoint.clone().sub(nextPoint).normalize();
       prevEndDirection = endDirection.clone();
     }
@@ -67,9 +67,23 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
       .clone()
       .multiplyScalar(distanceBetweenStartEnd * curvature)
       .add(endPoint);
-    curves.push(
-      new CubicBezierCurve3(startPoint, controlPoint1, controlPoint2, endPoint),
-    );
+
+    //to set object positions correctly
+    const center = endPoint.clone().add(startPoint).multiplyScalar(0.5);
+    startPoint.sub(center);
+    controlPoint1.sub(center);
+    controlPoint2.sub(center);
+    endPoint.sub(center);
+
+    curves.push({
+      curve: new CubicBezierCurve3(
+        startPoint,
+        controlPoint1,
+        controlPoint2,
+        endPoint,
+      ),
+      position: center,
+    });
   }
   return curves;
 }

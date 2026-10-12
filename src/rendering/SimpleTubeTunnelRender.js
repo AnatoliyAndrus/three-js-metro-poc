@@ -22,8 +22,9 @@ export class SimpleTubeTunnelRenderer {
     for (const tunnel of metro.tunnels) {
       const curves = createTunnelCurves(tunnel, 0.3);
       const tunnelSegments = [];
-      for (const curve of curves) {
-        const tunnelSegment = this.#tunnelSegmentFactory.create(curve);
+      for (const entry of curves) {
+        const tunnelSegment = this.#tunnelSegmentFactory.create(entry.curve);
+        tunnelSegment.position.copy(entry.position);
 
         tunnelSegments.push(tunnelSegment);
         this.#scene.add(tunnelSegment);
