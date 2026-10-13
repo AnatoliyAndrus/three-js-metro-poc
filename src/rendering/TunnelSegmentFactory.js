@@ -11,6 +11,7 @@ import {
   createInstancesAlongCurve,
 } from "./render-utils";
 import { Mesh } from "three";
+import { OffsetCurve } from "./OffsetCurve";
 
 export class TunnelSegmentFactory {
   //number of lights along the curve per unit of length
@@ -122,32 +123,39 @@ export class TunnelSegmentFactory {
   }
 
   /**
+   * Creates tunnel with given preferences
    * @param {Curve} curve
    * @returns {Group}
    */
   create(curve) {
+    const curveCenter = curve
+      .getPoint(0)
+      .add(curve.getPoint(1))
+      .multiplyScalar(0.5);
+    const offsetCurve = new OffsetCurve(curve, curveCenter.clone().negate());
     const tunnelSegment = new Group();
 
     const shell = new Mesh(
-      this.#createShellGeometry(curve),
+      this.#createShellGeometry(offsetCurve),
       this.shell.material,
     );
     const floor = new Mesh(
-      this.#createFloorGeometry(curve),
+      this.#createFloorGeometry(offsetCurve),
       this.floorMaterial,
     );
-    const railsGeometries = this.#createRailsGeometry(curve);
+    const railsGeometries = this.#createRailsGeometry(offsetCurve);
     const rails = [
       new Mesh(railsGeometries[0], this.rails.material),
       new Mesh(railsGeometries[1], this.rails.material),
     ];
-    const sleepers = this.#createSleepers(curve);
+    const sleepers = this.#createSleepers(offsetCurve);
 
     tunnelSegment.add(shell);
     tunnelSegment.add(floor);
     tunnelSegment.add(rails[0], rails[1]);
     tunnelSegment.add(sleepers);
 
+    tunnelSegment.position.copy(curveCenter);
     return tunnelSegment;
   }
 }

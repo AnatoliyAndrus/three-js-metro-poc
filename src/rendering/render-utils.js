@@ -15,7 +15,7 @@ import { Port } from "../domain/Port";
  * Creates array of curves and their positions
  * @param {Tunnel} tunnel
  * @param {number} curvature parameter to set distance from point to control point, defined as percent of distance between start and end point of curve, example, 0.1 = 10% of distance
- * @returns {[{curve: CubicBezierCurve3, position: Vector3}]}
+ * @returns {CubicBezierCurve3[]}
  */
 export function createTunnelCurves(tunnel, curvature = 0.3) {
   const curves = [];
@@ -68,22 +68,9 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
       .multiplyScalar(distanceBetweenStartEnd * curvature)
       .add(endPoint);
 
-    //to set object positions correctly
-    const center = endPoint.clone().add(startPoint).multiplyScalar(0.5);
-    startPoint.sub(center);
-    controlPoint1.sub(center);
-    controlPoint2.sub(center);
-    endPoint.sub(center);
-
-    curves.push({
-      curve: new CubicBezierCurve3(
-        startPoint,
-        controlPoint1,
-        controlPoint2,
-        endPoint,
-      ),
-      position: center,
-    });
+    curves.push(
+      new CubicBezierCurve3(startPoint, controlPoint1, controlPoint2, endPoint),
+    );
   }
   return curves;
 }
@@ -255,10 +242,27 @@ export function createInstancesAlongCurve(
   resolution,
   curve,
 ) {
-  const count = Math.ceil(curve.getLength() * resolution);
-  const mesh = new InstancedMesh(geometry, material, count);
+  const matrices = getMatrixesAlongCurve(profilePoint, resolution, curve);
+  const mesh = new InstancedMesh(geometry, material, matrices.length);
 
-  const matrix = new Matrix4();
+  for (let i = 0; i < matrices.length; i++) {
+    mesh.setMatrixAt(i, matrices[i]);
+  }
+
+  return mesh;
+}
+
+/**
+ * Makes transformation matrices for objects along the curve
+ * @param {Vector2} profilePoint
+ * @param {number} resolution
+ * @param {Curve} curve
+ * @returns {Matrix4[]} matrices
+ */
+export function getMatrixesAlongCurve(profilePoint, resolution, curve) {
+  const count = Math.ceil(curve.getLength() * resolution);
+  const matrices = [];
+
   for (let i = 0; i < count; i++) {
     const currentU = i / count;
     const globalPoint = getProfileGlobalPoints(
@@ -267,11 +271,11 @@ export function createInstancesAlongCurve(
       curve,
     )[0];
     const frame = getCurveFrame(currentU, curve);
-
+    const matrix = new Matrix4();
     matrix.makeBasis(frame.side, frame.localUp, frame.tangent);
     matrix.setPosition(globalPoint);
-    mesh.setMatrixAt(i, matrix);
+    matrices.push(matrix);
   }
 
-  return mesh;
+  return matrices;
 }
