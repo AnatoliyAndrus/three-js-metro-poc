@@ -1,4 +1,4 @@
-import { InstancedMesh, Material, Group } from "three";
+import { InstancedMesh, Material, Group, Light } from "three";
 import {
   BufferAttribute,
   BufferGeometry,
@@ -9,15 +9,13 @@ import {
 import {
   createGeometryAlongCurve,
   createInstancesAlongCurve,
+  getMatrixesAlongCurve,
 } from "./render-utils";
 import { Mesh } from "three";
 import { OffsetCurve } from "./OffsetCurve";
+import { TunnelLamp } from "./TunnelLamp";
 
 export class TunnelSegmentFactory {
-  //number of lights along the curve per unit of length
-  /**@type {number} */
-  lightsResolution;
-
   //profile here is actually only half of profile. For geometry generation it is mirrored (x -> -x)
   /**@type {{profile: Vector2[], resolution: number, material: Material}} */
   shell;
@@ -28,6 +26,8 @@ export class TunnelSegmentFactory {
   //offset sets position of center between rails, disanceBetween sets distance between rails
   /**@type {{profile: Vector2[], resolution: number, material: Material, offset: Vector2, distanceBetween: number}} */
   rails;
+  /**@type {{profilePoint: Vector2, resolution: number, casing: Group, light: Light}} */
+  lights;
 
   /**
    * Method that creates geometry of outer shell of tunnel based on shell.profile and shell.resolution
@@ -68,7 +68,28 @@ export class TunnelSegmentFactory {
     );
   }
 
-  #createLights(curve) {}
+  /**
+   * @param {Curve} curve
+   * @returns {Group}
+   */
+  #createLights(curve) {
+    const matrices = getMatrixesAlongCurve(
+      this.lights.profilePoint,
+      this.lights.resolution,
+      curve,
+    );
+    const lamps = new Group();
+
+    for (let matrix of matrices) {
+      const lamp = new TunnelLamp(this.lights.casing, this.lights.light);
+
+      matrix.decompose(lamp.position, lamp.quaternion, lamp.scale);
+
+      lamp.updateMatrix();
+      lamps.add(lamp);
+    }
+    return lamps;
+  }
 
   /**
    *
@@ -128,34 +149,37 @@ export class TunnelSegmentFactory {
    * @returns {Group}
    */
   create(curve) {
-    const curveCenter = curve
-      .getPoint(0)
-      .add(curve.getPoint(1))
-      .multiplyScalar(0.5);
-    const offsetCurve = new OffsetCurve(curve, curveCenter.clone().negate());
+    const offsetCurve = new OffsetCurve(curve).offsetToCurveCenter();
+
     const tunnelSegment = new Group();
 
     const shell = new Mesh(
       this.#createShellGeometry(offsetCurve),
       this.shell.material,
     );
+
     const floor = new Mesh(
       this.#createFloorGeometry(offsetCurve),
       this.floorMaterial,
     );
+
     const railsGeometries = this.#createRailsGeometry(offsetCurve);
     const rails = [
       new Mesh(railsGeometries[0], this.rails.material),
       new Mesh(railsGeometries[1], this.rails.material),
     ];
+
     const sleepers = this.#createSleepers(offsetCurve);
+
+    const lamps = this.#createLights(offsetCurve);
 
     tunnelSegment.add(shell);
     tunnelSegment.add(floor);
     tunnelSegment.add(rails[0], rails[1]);
     tunnelSegment.add(sleepers);
+    tunnelSegment.add(lamps);
 
-    tunnelSegment.position.copy(curveCenter);
+    tunnelSegment.position.copy(offsetCurve.offset.clone().negate());
     return tunnelSegment;
   }
 }

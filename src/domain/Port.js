@@ -16,7 +16,7 @@ export class Port {
   localRotation;
   /** @type {MetroNode} */
   node;
-  /** @type {string} type of port, in or out */
+  /** @type {string} type of port, in or out in relation to its node*/
   type;
 
   /**

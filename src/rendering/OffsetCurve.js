@@ -60,4 +60,17 @@ export class OffsetCurve extends Curve {
     this.curve = source.curve.clone();
     return this;
   }
+
+  /**
+   * Offsets curve, so that it's center is in 0 coordinate
+   */
+  offsetToCurveCenter() {
+    this.offset = this.curve
+      .getPoint(0)
+      .add(this.curve.getPoint(1))
+      .multiplyScalar(0.5)
+      .negate();
+
+    return this;
+  }
 }
