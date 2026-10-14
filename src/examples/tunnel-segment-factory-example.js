@@ -42,11 +42,13 @@ export function testFactory() {
     profilePoint: new Vector2(0, 0.025),
   };
 
-  factory.floorMaterial = new MeshStandardMaterial({
-    color: new Color().setRGB(0.5, 0.5, 0.5),
-    side: BackSide,
-    // wireframe: true,
-  });
+  factory.floor = {
+    material: new MeshStandardMaterial({
+      color: new Color().setRGB(0.5, 0.5, 0.5),
+      side: BackSide,
+      // wireframe: true,
+    }),
+  };
 
   factory.rails = {
     profile: [

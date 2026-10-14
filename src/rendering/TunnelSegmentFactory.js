@@ -14,6 +14,7 @@ import {
 import { Mesh } from "three";
 import { OffsetCurve } from "./OffsetCurve";
 import { TunnelLamp } from "./TunnelLamp";
+import { TunnelSegment } from "./TunnelSegment";
 
 export class TunnelSegmentFactory {
   //profile here is actually only half of profile. For geometry generation it is mirrored (x -> -x)
@@ -21,8 +22,8 @@ export class TunnelSegmentFactory {
   shell;
   /**@type {{resolution: number, geometry: BufferGeometry, material: Material, profilePoint: Vector2}} */
   sleepers;
-  /**@type {Material} */
-  floorMaterial;
+  /**@type {{material: Material}} */
+  floor;
   //offset sets position of center between rails, disanceBetween sets distance between rails
   /**@type {{profile: Vector2[], resolution: number, material: Material, offset: Vector2, distanceBetween: number}} */
   rails;
@@ -53,7 +54,8 @@ export class TunnelSegmentFactory {
   /**
    * Create floor geometry of tunnel, based on first point of profile.
    * Uses same resolution as shell
-   * @param {*} curve
+   * @param {Curve} curve
+   * @returns {BufferGeometry}
    */
   #createFloorGeometry(curve) {
     const profile = [
@@ -144,40 +146,65 @@ export class TunnelSegmentFactory {
   }
 
   /**
+   *
+   * @param {Curve} curve
+   * @returns {Mesh[]}
+   */
+  #createRails(curve) {
+    const railsGeometries = this.#createRailsGeometry(curve);
+    const rails = [
+      new Mesh(railsGeometries[0], this.rails.material),
+      new Mesh(railsGeometries[1], this.rails.material),
+    ];
+    return rails;
+  }
+
+  /**
+   *
+   * @param {Curve} curve
+   * @returns {Mesh}
+   */
+  #createFloor(curve) {
+    const floor = new Mesh(
+      this.#createFloorGeometry(curve),
+      this.floor.material,
+    );
+    return floor;
+  }
+
+  /**
+   *
+   * @param {Curve} curve
+   * @returns {Mesh}
+   */
+  #createShell(curve) {
+    const shell = new Mesh(
+      this.#createShellGeometry(curve),
+      this.shell.material,
+    );
+    return shell;
+  }
+
+  /**
    * Creates tunnel with given preferences
    * @param {Curve} curve
    * @returns {Group}
    */
   create(curve) {
+    if (!this.shell) throw new Error("Tunnel segment has to have shell");
+
     const offsetCurve = new OffsetCurve(curve).offsetToCurveCenter();
 
-    const tunnelSegment = new Group();
+    const tunnelSegment = new TunnelSegment();
 
-    const shell = new Mesh(
-      this.#createShellGeometry(offsetCurve),
-      this.shell.material,
-    );
+    tunnelSegment.addShell(this.#createShell(offsetCurve));
+    if (this.floor) tunnelSegment.addFloor(this.#createFloor(offsetCurve));
+    if (this.rails) tunnelSegment.addRails(this.#createRails(offsetCurve));
+    if (this.sleepers)
+      tunnelSegment.addSleepers(this.#createSleepers(offsetCurve));
+    if (this.lights) tunnelSegment.addLights(this.#createLights(offsetCurve));
 
-    const floor = new Mesh(
-      this.#createFloorGeometry(offsetCurve),
-      this.floorMaterial,
-    );
-
-    const railsGeometries = this.#createRailsGeometry(offsetCurve);
-    const rails = [
-      new Mesh(railsGeometries[0], this.rails.material),
-      new Mesh(railsGeometries[1], this.rails.material),
-    ];
-
-    const sleepers = this.#createSleepers(offsetCurve);
-
-    const lamps = this.#createLights(offsetCurve);
-
-    tunnelSegment.add(shell);
-    tunnelSegment.add(floor);
-    tunnelSegment.add(rails[0], rails[1]);
-    tunnelSegment.add(sleepers);
-    tunnelSegment.add(lamps);
+    tunnelSegment.curve = curve;
 
     tunnelSegment.position.copy(offsetCurve.offset.clone().negate());
     return tunnelSegment;
