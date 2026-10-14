@@ -1,6 +1,6 @@
 "use strict";
-import data from "./src/examples/tunnel-points-test.json";
-import { testFactory } from "./src/examples/tunnel-segment-factory-example";
+import metroExample from "./src/examples/metro-1.json";
+import { testFactory } from "./src/examples/tunnels/tunnel-segment-factory-example";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Metro } from "./src/domain/Metro";
@@ -69,7 +69,7 @@ renderer.setAnimationLoop(() => {
 // console.log(JSON.stringify(metro));
 
 //importing metro from json file
-const metro = Metro.fromJSON(data);
+const metro = Metro.fromJSON(metroExample);
 
 const tunnelSegmentFactory = new testFactory();
 

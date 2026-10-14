@@ -3,12 +3,11 @@ import {
   BoxGeometry,
   Color,
   Vector2,
-  SpotLight,
   Group,
   MeshStandardMaterial,
   Mesh,
 } from "three";
-import { TunnelSegmentFactory } from "../rendering/TunnelSegmentFactory";
+import { TunnelSegmentFactory } from "../../rendering/TunnelSegmentFactory";
 import { MeshBasicMaterial } from "three";
 import { PointLight } from "three";
 
