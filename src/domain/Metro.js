@@ -28,12 +28,36 @@ export class Metro {
     };
   }
   static fromJSON(data) {
-    // port depends on its node, tunnel depends on port from and to
+    // port depends on its node, tunnel depends on port 'from' and 'to'
     const nodes = data.nodes.map((node) => MetroNode.fromJSON(node));
-    const ports = data.ports.map((port) => Port.fromJSON(port, nodes));
-    const tunnels = data.tunnels.map((tunnel) =>
-      Tunnel.fromJSON(tunnel, ports),
-    );
+
+    // ports depend on nodes and other ports, so their deserialization happens here
+    const ports = [];
+    for (const portData of data.ports) {
+      const portNode = nodes.find((node) => node.id == portData.nodeId);
+      const connectedPort =
+        ports.find((port) => portData.connectedPortId === port.id) ?? null;
+
+      ports.push(
+        new Port(
+          new Vector3().fromArray(portData.localPosition),
+          new Euler().fromArray(portData.localRotation),
+          portNode,
+          portData.type,
+          connectedPort,
+          portData.id,
+        ),
+      );
+    }
+
+    const tunnels = data.tunnels.map((tunnel) => {
+      const from = ports.find((port) => port.id == tunnel.fromId);
+      const to = ports.find((port) => port.id == tunnel.toId);
+      const points = tunnel.points.map((point) =>
+        new Vector3().fromArray(point),
+      );
+      return new Tunnel(from, to, points, tunnel.id);
+    });
 
     return new Metro(nodes, ports, tunnels);
   }

@@ -18,26 +18,79 @@ export class Port {
   node;
   /** @type {string} type of port, in or out in relation to its node*/
   type;
+  /**@type {Port} */
+  connectedPort;
 
   /**
    * @param {Vector3} position
    * @param {Euler} rotation
-   * @param {String|null} id
    * @param {MetroNode|null} node
    * @param {String} type
+   * @param {Port} connectedPort
+   * @param {String|null} id
    */
   constructor(
     localPosition = new Vector3(),
     localRotation = new Euler(0, 0, 0),
     node = null,
     type = "in",
-    id = null,
+    connectedPort = null,
+    id,
   ) {
+    console.log(connectedPort);
     this.id = id ?? UUID.v4();
     this.localPosition = localPosition;
     this.localRotation = localRotation;
-    this.node = node;
+    if (node) this.setNode(node);
     this.type = type;
+    this.connectWith(connectedPort);
+  }
+
+  /**
+   *
+   * @param {MetroNode} node
+   * @returns {this}
+   */
+  setNode(node) {
+    if (this.node === node) return this;
+
+    this.node?.removePort(this);
+
+    this.node = node ?? null;
+
+    if (node && !node.ports.includes(this)) {
+      node.ports.push(this);
+    }
+
+    return this;
+  }
+
+  /**
+   *
+   * @returns {this}
+   */
+  removeNode() {
+    return this.setNode(null);
+  }
+
+  /**
+   * @param {Port}
+   * @returns {this}
+   */
+  connectWith(port) {
+    console.log(port);
+    if (this.connectedPort === port) return this;
+    if (port && !(port instanceof Port)) throw Error("Must be port");
+
+    if (this === port) throw new Error("Cannot connect port with itself");
+    if (port && this.node !== port.node)
+      throw new Error("Port can't be connected to port from another node");
+
+    if (this.connectedPort) this.connectedPort.connectedPort = null;
+    this.connectedPort = port;
+
+    if (port) port.connectedPort = this;
+    return this;
   }
 
   /**
@@ -65,24 +118,9 @@ export class Port {
       id: this.id,
       localPosition: this.localPosition.toArray(),
       localRotation: this.localRotation.toArray(),
-      nodeId: this.node.id,
+      nodeId: this.node?.id,
+      connectedPortId: this.connectedPort?.id,
       type: this.type,
     };
-  }
-
-  /**
-   * Because port object relies on its node, to deserialize it nodes are also needed
-   * @param {*} data data of object
-   * @param {MetroNode[]} nodes already deserialized array of nodes
-   */
-  static fromJSON(data, nodes) {
-    const node = nodes.find((node) => node.id == data.nodeId);
-    return new Port(
-      new Vector3().fromArray(data.localPosition),
-      new Euler().fromArray(data.localRotation),
-      node,
-      data.type,
-      data.id,
-    );
   }
 }

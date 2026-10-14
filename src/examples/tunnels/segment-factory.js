@@ -73,7 +73,7 @@ export function testFactory() {
     profilePoint: new Vector2(0.96, 0.36),
     resolution: 0.2,
     casing: testLampCasing(),
-    light: testLampLight(),
+    light: new PointLight(0xffd6a0, 2, 6, 2),
   };
 
   return factory;
@@ -106,10 +106,4 @@ function testLampCasing() {
   addWall(0.06, t, 0.08, 0, -s, 0);
 
   return box;
-}
-
-function testLampLight() {
-  const light = new PointLight(0xffd6a0, 2, 6, 2);
-
-  return light;
 }

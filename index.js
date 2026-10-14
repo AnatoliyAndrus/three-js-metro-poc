@@ -1,7 +1,7 @@
 "use strict";
 import metroExample from "./src/examples/metro-1.json";
-import { testFactory } from "./src/examples/tunnels/tunnel-segment-factory-example";
-import * as THREE from "three";
+import { testFactory } from "./src/examples/tunnels/segment-factory";
+import { Vector3, Scene, WebGLRenderer, PerspectiveCamera, Euler } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Metro } from "./src/domain/Metro";
 import { MetroNode } from "./src/domain/MetroNode";
@@ -9,19 +9,18 @@ import { Port } from "./src/domain/Port";
 import { Tunnel } from "./src/domain/Tunnel";
 
 import { SimpleTubeTunnelRenderer } from "./src/rendering/SimpleTubeTunnelRender";
-import { TunnelSegmentFactory } from "./src/rendering/TunnelSegmentFactory";
 
 const container = document.querySelector(".sceneContainer");
 
-const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const scene = new Scene();
+const renderer = new WebGLRenderer({ antialias: true });
 const canvas = renderer.domElement;
 canvas.style.display = "block";
 const width = container.clientWidth;
 const height = container.clientHeight;
 renderer.setSize(width, height);
 container.append(canvas);
-const camera = new THREE.PerspectiveCamera(90, width / height, 0.1, 10_000);
+const camera = new PerspectiveCamera(90, width / height, 0.1, 10_000);
 camera.position.set(0, 10, 10);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
@@ -34,15 +33,22 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 
-// //creating our own metro
+// creating our own metro
 // const station1 = new MetroNode(new Vector3(0, 0, 0));
 // const station2 = new MetroNode(new Vector3(100, 0, 10));
 
-// const station1Port = new Port(
+// const station1Port1 = new Port(
+//   new Vector3(-1, 0, -1),
+//   new Euler(0, 0, 0),
+//   station1,
+//   "in",
+// );
+// const station1Port2 = new Port(
 //   new Vector3(1, 0, -1),
-//   new Euler(0, -0, 0),
+//   new Euler(0, 0, 0),
 //   station1,
 //   "out",
+//   station1Port1,
 // );
 // const station2Port = new Port(
 //   new Vector3(-1, 0, -1),
@@ -58,11 +64,11 @@ renderer.setAnimationLoop(() => {
 //   new Vector3(50, 1, 15),
 //   new Vector3(70, 0, 7),
 // ];
-// const tunnel = new Tunnel(station1Port, station2Port, points);
+// const tunnel = new Tunnel(station1Port2, station2Port, points);
 
 // const metro = new Metro(
 //   [station1, station2],
-//   [station1Port, station2Port],
+//   [station1Port1, station1Port2, station2Port],
 //   [tunnel],
 // );
 // console.log(metro);
@@ -70,6 +76,8 @@ renderer.setAnimationLoop(() => {
 
 //importing metro from json file
 const metro = Metro.fromJSON(metroExample);
+
+console.log(metro);
 
 const tunnelSegmentFactory = new testFactory();
 
