@@ -20,11 +20,11 @@ import { Port } from "../domain/Port";
 export function createTunnelCurves(tunnel, curvature = 0.3) {
   const curves = [];
 
-  const fromGlobalPosition = getPortGlobalPosition(tunnel.from);
-  const fromDirection = getPortDirectionVector(tunnel.from);
+  const fromGlobalPosition = tunnel.from.getGlobalPosition();
+  const fromDirection = tunnel.from.getGlobalDirection();
 
-  const toGlobalPosition = getPortGlobalPosition(tunnel.to);
-  const toDirection = getPortDirectionVector(tunnel.to);
+  const toGlobalPosition = tunnel.to.getGlobalPosition();
+  const toDirection = tunnel.to.getGlobalDirection();
 
   //saving previous end direction, and setting its negated version to next start direction to make less computations
   let prevEndDirection = null;
@@ -73,28 +73,6 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
     );
   }
   return curves;
-}
-
-/**
- * @param {Port} port
- * @returns {Vector3} global position of the port, taking into account position and rotation of its node
- */
-export function getPortGlobalPosition(port) {
-  return port.localPosition
-    .clone()
-    .applyEuler(port.node.rotation)
-    .add(port.node.position);
-}
-
-/**
- *
- * @param {Port} port
- * @returns {Vector3} direction vector of port is considered its 'x' axis
- */
-export function getPortDirectionVector(port) {
-  return new Vector3(1, 0, 0)
-    .applyEuler(port.localRotation)
-    .applyEuler(port.node.rotation);
 }
 
 /**

@@ -40,6 +40,26 @@ export class Port {
     this.type = type;
   }
 
+  /**
+   * @returns {Vector3} global position of the port, taking into account position and rotation of its node
+   */
+  getGlobalPosition() {
+    return this.localPosition
+      .clone()
+      .applyEuler(this.node.rotation)
+      .add(this.node.position);
+  }
+
+  /**
+   *
+   * @returns {Vector3} direction vector of port is considered its 'x' axis
+   */
+  getGlobalDirection() {
+    return new Vector3(1, 0, 0)
+      .applyEuler(this.localRotation)
+      .applyEuler(this.node.rotation);
+  }
+
   toJSON() {
     return {
       id: this.id,
