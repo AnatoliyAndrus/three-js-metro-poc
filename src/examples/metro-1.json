@@ -20,7 +20,7 @@
       "localRotation": [0, 0, 0, "XYZ"],
       "nodeId": "58c22268-71b8-4c8a-b343-07a4417a0aa7",
       "connectedPortId": "3a58d46c-f4cc-4e4d-89bc-c491cd300478",
-      "type": "in"
+      "type": "to"
     },
     {
       "id": "3a58d46c-f4cc-4e4d-89bc-c491cd300478",
@@ -28,14 +28,14 @@
       "localRotation": [0, 0, 0, "XYZ"],
       "nodeId": "58c22268-71b8-4c8a-b343-07a4417a0aa7",
       "connectedPortId": "41302f78-9fe6-4856-b3d5-969af970eebb",
-      "type": "out"
+      "type": "from"
     },
     {
       "id": "d2829147-a7a1-4d69-8490-616f90ad2dfa",
       "localPosition": [-1, 0, -1],
       "localRotation": [0, 0, 0, "XYZ"],
       "nodeId": "584c37d9-d041-4781-9b16-59b1c4cb3c2c",
-      "type": "in"
+      "type": "to"
     }
   ],
   "tunnels": [

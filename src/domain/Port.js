@@ -16,7 +16,7 @@ export class Port {
   localRotation;
   /** @type {MetroNode} */
   node;
-  /** @type {string} type of port, in or out in relation to its node*/
+  /** @type {string} type of port, 'to' or 'from' in relation to its node*/
   type;
   /**@type {Port} */
   connectedPort;
@@ -33,7 +33,7 @@ export class Port {
     localPosition = new Vector3(),
     localRotation = new Euler(0, 0, 0),
     node = null,
-    type = "in",
+    type = "to",
     connectedPort = null,
     id,
   ) {

@@ -41,20 +41,20 @@ renderer.setAnimationLoop(() => {
 //   new Vector3(-1, 0, -1),
 //   new Euler(0, 0, 0),
 //   station1,
-//   "in",
+//   "to",
 // );
 // const station1Port2 = new Port(
 //   new Vector3(1, 0, -1),
 //   new Euler(0, 0, 0),
 //   station1,
-//   "out",
+//   "from",
 //   station1Port1,
 // );
 // const station2Port = new Port(
 //   new Vector3(-1, 0, -1),
 //   new Euler(0, 0, 0),
 //   station2,
-//   "in",
+//   "to",
 // );
 
 // const points = [

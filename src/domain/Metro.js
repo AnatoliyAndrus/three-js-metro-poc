@@ -65,24 +65,16 @@ export class Metro {
   /**
    * adds junction with given ports
    * all junctions and their ports are located in horizontal plane, therefore they have only y rotation. local position of port is set in x and z coordinates.
+   * junction is node where there are exactly 2 'to' ports and 1 'from' port or vice versa
    * @param {Vector3} nodePosition
    * @param {number} nodeRotationY
-   * @param {object[]} portsInfo array of objects with fields x, z, yRotation, type ('in' or 'out')
+   * @param {{x: number, z: number, yRotation:number, type:string}[]} portsInfo
+   * @returns {MetroNode}
    */
   addJunction(nodePosition, nodeRotationY, portsInfo) {
     if (portsInfo?.length !== 3)
       throw new Error("There are exactly 3 ports in the junction");
 
-    const inCount = portsInfo.filter((port) => port.type === "in").length;
-    const outCount = portsInfo.filter((port) => port.type === "out").length;
-
-    if (
-      !((inCount === 1 && outCount === 2) || (inCount === 2 && outCount === 1))
-    ) {
-      throw new Error(
-        "there must be exactly 1 port of one type and 2 of another",
-      );
-    }
     const node = new MetroNode(
       nodePosition,
       new Euler(0, nodeRotationY, 0),
