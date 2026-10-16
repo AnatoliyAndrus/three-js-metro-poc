@@ -75,6 +75,20 @@ export class Metro {
     if (portsInfo?.length !== 3)
       throw new Error("There are exactly 3 ports in the junction");
 
+    const to = portsInfo.filter((port) => port.type === "to");
+    const from = portsInfo.filter((port) => port.type === "from");
+
+    if (
+      !(
+        (to.length === 1 && from.length === 2) ||
+        (to.length === 2 && from.length === 1)
+      )
+    ) {
+      throw new Error(
+        "there must be exactly 1 port of one type and 2 of another",
+      );
+    }
+
     const node = new MetroNode(
       nodePosition,
       new Euler(0, nodeRotationY, 0),
@@ -93,5 +107,6 @@ export class Metro {
         ),
       );
     });
+    return node;
   }
 }

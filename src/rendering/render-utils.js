@@ -8,9 +8,9 @@ import {
   Matrix4,
   InstancedMesh,
   ShapeUtils,
+  Curve,
 } from "three";
 import { Tunnel } from "../domain/Tunnel";
-import { Port } from "../domain/Port";
 /**
  * Creates array of curves and their positions
  * @param {Tunnel} tunnel
@@ -57,22 +57,50 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
       endDirection = startPoint.clone().sub(nextPoint).normalize();
       prevEndDirection = endDirection.clone();
     }
-
-    const distanceBetweenStartEnd = endPoint.clone().sub(startPoint).length();
-    const controlPoint1 = startDirection
-      .clone()
-      .multiplyScalar(distanceBetweenStartEnd * curvature)
-      .add(startPoint);
-    const controlPoint2 = endDirection
-      .clone()
-      .multiplyScalar(distanceBetweenStartEnd * curvature)
-      .add(endPoint);
-
     curves.push(
-      new CubicBezierCurve3(startPoint, controlPoint1, controlPoint2, endPoint),
+      createCurve(
+        startPoint,
+        startDirection,
+        endDirection,
+        endPoint,
+        curvature,
+      ),
     );
   }
   return curves;
+}
+
+/**
+ *
+ * @param {Vector3} startPoint
+ * @param {Vector3} startDirection
+ * @param {Vector3} endDirection
+ * @param {Vector3} endPoint
+ * @param {number} curvature
+ * @returns {CubicBezierCurve3} curve
+ */
+export function createCurve(
+  startPoint,
+  startDirection,
+  endDirection,
+  endPoint,
+  curvature = 0.3,
+) {
+  const distanceBetweenStartEnd = endPoint.clone().sub(startPoint).length();
+  const controlPoint1 = startDirection
+    .clone()
+    .multiplyScalar(distanceBetweenStartEnd * curvature)
+    .add(startPoint);
+  const controlPoint2 = endDirection
+    .clone()
+    .multiplyScalar(distanceBetweenStartEnd * curvature)
+    .add(endPoint);
+  return new CubicBezierCurve3(
+    startPoint,
+    controlPoint1,
+    controlPoint2,
+    endPoint,
+  );
 }
 
 /**
@@ -102,6 +130,7 @@ export function createGeometryAlongCurve(
   const geometry = new BufferGeometry();
   const positionAttribute = [];
   const index = [];
+  const uvAttribute = [];
 
   // consider points of tunnel shell as grid with i - number of segment and j - number of point in segment
   const pointToIndex = (i, j) => {
@@ -121,6 +150,12 @@ export function createGeometryAlongCurve(
         profileGlobalPoints[j].y,
         profileGlobalPoints[j].z,
       );
+
+      uvAttribute.push(
+        i / (numberOfProfiles - 1),
+        j / (profileGlobalPoints.length - 1),
+      );
+
       if (i > 0 && (fullTube || j > 0)) {
         const prevJ = j > 0 ? j - 1 : profile.length - 1;
         //pushing two polygons into index
@@ -144,7 +179,7 @@ export function createGeometryAlongCurve(
     const lastProfileOffset = profile.length * (numberOfProfiles - 1);
     for (let polygon of sealIndex) {
       index.push(polygon[0], polygon[2], polygon[1]);
-      console.log(polygon[0] + lastProfileOffset);
+
       index.push(
         polygon[0] + lastProfileOffset,
         polygon[1] + lastProfileOffset,
@@ -157,8 +192,16 @@ export function createGeometryAlongCurve(
     "position",
     new BufferAttribute(new Float32Array(positionAttribute), 3),
   );
+  geometry.setAttribute(
+    "uv",
+    new BufferAttribute(new Float32Array(uvAttribute), 2),
+  );
   geometry.setIndex(index);
+
   geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+
   return geometry;
 }
 

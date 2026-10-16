@@ -2,11 +2,13 @@ import * as THREE from "three";
 import { Metro } from "../domain/Metro";
 import { createTunnelCurves } from "./render-utils";
 import { TunnelSegmentFactory } from "./TunnelSegmentFactory";
+import { JunctionFactory } from "./JunctionFactory";
 
-export class SimpleTubeTunnelRenderer {
+export class MetroRenderer {
   #scene;
   #tunnels = [];
   #tunnelSegmentFactory;
+  #junctionFactory;
 
   /**
    *
@@ -16,8 +18,13 @@ export class SimpleTubeTunnelRenderer {
   constructor(scene, tunnelSegmentFactory) {
     this.#scene = scene;
     this.#tunnelSegmentFactory = tunnelSegmentFactory;
+    this.#junctionFactory = new JunctionFactory(tunnelSegmentFactory);
   }
 
+  /**
+   *
+   * @param {Metro} metro
+   */
   render(metro) {
     for (const tunnel of metro.tunnels) {
       const curves = createTunnelCurves(tunnel, 0.3);
@@ -29,6 +36,12 @@ export class SimpleTubeTunnelRenderer {
         this.#scene.add(tunnelSegment);
       }
       this.#tunnels.push(tunnelSegments);
+    }
+
+    for (const metroNode of metro.nodes) {
+      if (metroNode.type == "junction") {
+        this.#scene.add(this.#junctionFactory.create(metroNode));
+      }
     }
   }
 }

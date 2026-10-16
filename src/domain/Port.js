@@ -37,7 +37,6 @@ export class Port {
     connectedPort = null,
     id,
   ) {
-    console.log(connectedPort);
     this.id = id ?? UUID.v4();
     this.localPosition = localPosition;
     this.localRotation = localRotation;
@@ -78,7 +77,6 @@ export class Port {
    * @returns {this}
    */
   connectWith(port) {
-    console.log(port);
     if (this.connectedPort === port) return this;
     if (port && !(port instanceof Port)) throw Error("Must be port");
 

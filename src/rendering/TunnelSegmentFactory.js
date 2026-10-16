@@ -33,9 +33,10 @@ export class TunnelSegmentFactory {
   /**
    * Method that creates geometry of outer shell of tunnel based on shell.profile and shell.resolution
    * @param {Curve} curve
+   * @param {boolean} sealed whether method creates sealed tube. Used for creating cutter
    * @returns {BufferGeometry}
    */
-  #createShellGeometry(curve) {
+  createShellGeometry(curve, sealed = false) {
     const fullShellProfile = [...this.shell.profile];
     for (let i = this.shell.profile.length - 1; i >= 0; i--) {
       fullShellProfile.push(
@@ -47,7 +48,8 @@ export class TunnelSegmentFactory {
       fullShellProfile,
       this.shell.resolution,
       curve,
-      false,
+      sealed,
+      sealed,
     );
   }
 
@@ -57,7 +59,7 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {BufferGeometry}
    */
-  #createFloorGeometry(curve) {
+  createFloorGeometry(curve) {
     const profile = [
       new Vector2(-this.shell.profile[0].x, this.shell.profile[0].y),
       this.shell.profile[0],
@@ -74,7 +76,7 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {Group}
    */
-  #createLights(curve) {
+  createLights(curve) {
     const matrices = getMatrixesAlongCurve(
       this.lights.profilePoint,
       this.lights.resolution,
@@ -98,7 +100,7 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {BufferGeometry[]} geometries for two rails
    */
-  #createRailsGeometry(curve) {
+  createRailsGeometry(curve) {
     const offsetRail1 = this.rails.offset
       .clone()
       .add(new Vector2(this.rails.distanceBetween / 2, 0));
@@ -135,7 +137,7 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {InstancedMesh}
    */
-  #createSleepers(curve) {
+  createSleepers(curve) {
     return createInstancesAlongCurve(
       this.sleepers.profilePoint,
       this.sleepers.geometry,
@@ -150,8 +152,8 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {Mesh[]}
    */
-  #createRails(curve) {
-    const railsGeometries = this.#createRailsGeometry(curve);
+  createRails(curve) {
+    const railsGeometries = this.createRailsGeometry(curve);
     const rails = [
       new Mesh(railsGeometries[0], this.rails.material),
       new Mesh(railsGeometries[1], this.rails.material),
@@ -164,9 +166,9 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {Mesh}
    */
-  #createFloor(curve) {
+  createFloor(curve) {
     const floor = new Mesh(
-      this.#createFloorGeometry(curve),
+      this.createFloorGeometry(curve),
       this.floor.material,
     );
     return floor;
@@ -177,9 +179,9 @@ export class TunnelSegmentFactory {
    * @param {Curve} curve
    * @returns {Mesh}
    */
-  #createShell(curve) {
+  createShell(curve) {
     const shell = new Mesh(
-      this.#createShellGeometry(curve),
+      this.createShellGeometry(curve),
       this.shell.material,
     );
     return shell;
@@ -188,21 +190,19 @@ export class TunnelSegmentFactory {
   /**
    * Creates tunnel with given preferences
    * @param {Curve} curve
-   * @returns {Group}
+   * @returns {TunnelSegment}
    */
   create(curve) {
-    if (!this.shell) throw new Error("Tunnel segment has to have shell");
-
     const offsetCurve = new OffsetCurve(curve).offsetToCurveCenter();
 
     const tunnelSegment = new TunnelSegment();
 
-    tunnelSegment.addShell(this.#createShell(offsetCurve));
-    if (this.floor) tunnelSegment.addFloor(this.#createFloor(offsetCurve));
-    if (this.rails) tunnelSegment.addRails(this.#createRails(offsetCurve));
+    if (this.shell) tunnelSegment.addShell(this.createShell(offsetCurve));
+    if (this.floor) tunnelSegment.addFloor(this.createFloor(offsetCurve));
+    if (this.rails) tunnelSegment.addRails(this.createRails(offsetCurve));
     if (this.sleepers)
-      tunnelSegment.addSleepers(this.#createSleepers(offsetCurve));
-    if (this.lights) tunnelSegment.addLights(this.#createLights(offsetCurve));
+      tunnelSegment.addSleepers(this.createSleepers(offsetCurve));
+    if (this.lights) tunnelSegment.addLights(this.createLights(offsetCurve));
 
     tunnelSegment.curve = curve;
 

@@ -21,6 +21,9 @@ export class Tunnel {
    * @param {String|null} id
    */
   constructor(from, to, points = [], id) {
+    if (from.type != "from")
+      throw new Error("'From' port must have type 'from'");
+    if (to.type != "to") throw new Error("'To' port must have type 'to'");
     this.id = id ?? UUID.v4();
     this.from = from;
     this.to = to;
