@@ -15,6 +15,7 @@ import { Mesh } from "three";
 import { OffsetCurve } from "./OffsetCurve";
 import { TunnelLamp } from "./TunnelLamp";
 import { TunnelSegment } from "./TunnelSegment";
+import { mx_bilerp_1 } from "three/src/nodes/materialx/MaterialXNoise.js";
 
 export class TunnelSegmentFactory {
   //profile here is actually only half of profile. For geometry generation it is mirrored (x -> -x)
@@ -33,14 +34,20 @@ export class TunnelSegmentFactory {
   /**
    * Method that creates geometry of outer shell of tunnel based on shell.profile and shell.resolution
    * @param {Curve} curve
+   * @param {number} scale scales profile points
    * @param {boolean} sealed whether method creates sealed tube. Used for creating cutter
    * @returns {BufferGeometry}
    */
-  createShellGeometry(curve, sealed = false) {
-    const fullShellProfile = [...this.shell.profile];
+  createShellGeometry(curve, scale = 1, sealed = false) {
+    const fullShellProfile = this.shell.profile.map(
+      (point) => new Vector2(point.x * scale, point.y * scale),
+    );
     for (let i = this.shell.profile.length - 1; i >= 0; i--) {
       fullShellProfile.push(
-        new Vector2(-this.shell.profile[i].x, this.shell.profile[i].y),
+        new Vector2(
+          -this.shell.profile[i].x * scale,
+          this.shell.profile[i].y * scale,
+        ),
       );
     }
 

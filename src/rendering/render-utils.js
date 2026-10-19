@@ -9,8 +9,10 @@ import {
   InstancedMesh,
   ShapeUtils,
   Curve,
+  Mesh,
 } from "three";
 import { Tunnel } from "../domain/Tunnel";
+import { Raycaster } from "three";
 /**
  * Creates array of curves and their positions
  * @param {Tunnel} tunnel
@@ -299,4 +301,19 @@ export function getMatrixesAlongCurve(profilePoint, resolution, curve) {
   }
 
   return matrices;
+}
+
+/**
+ * Returns true if point is inside the mesh, false otherwise
+ * Mesh has to be closed
+ * @param {Vector3} point
+ * @param {Mesh} mesh
+ * @returns {boolean}
+ */
+export function isPointInsideMesh(point, mesh) {
+  const raycaster = new Raycaster(new Vector3().copy(point));
+
+  const hits = raycaster.intersectObject(mesh);
+
+  return hits.length % 2 == 1;
 }

@@ -65,7 +65,6 @@ const junction = metro.addJunction(new Vector3(100, 10, 10), 0, [
   { x: 30, z: 5, yRotation: 0, type: "from" },
   { x: 30, z: -5, yRotation: 0, type: "from" },
 ]);
-console.log(junction);
 
 const tunnel = new Tunnel(
   station1Port2,

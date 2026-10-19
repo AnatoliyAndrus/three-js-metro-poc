@@ -1,15 +1,15 @@
 import { MetroNode } from "../domain/MetroNode";
 import { TunnelSegmentFactory } from "./TunnelSegmentFactory";
+import { HOLLOW_SUBTRACTION, Brush, Evaluator } from "three-bvh-csg";
 import {
-  HOLLOW_SUBTRACTION,
-  Brush,
-  Evaluator,
-  HOLLOW_INTERSECTION,
-} from "three-bvh-csg";
-import { createCurve, createGeometryAlongCurve } from "./render-utils";
-import { Curve, Vector3, Group, Mesh } from "three";
+  createCurve,
+  createGeometryAlongCurve,
+  isPointInsideMesh,
+} from "./render-utils";
+import { Curve, Vector3, Group, Mesh, DoubleSide } from "three";
 import { OffsetCurve } from "./OffsetCurve";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { MeshBasicMaterial } from "three";
 
 export class JunctionFactory {
   segmentFactory;
@@ -96,20 +96,19 @@ export class JunctionFactory {
       this.segmentFactory.createShellGeometry(curve2),
       this.segmentFactory.shell.material,
     );
+    const cutterMaterial = new MeshBasicMaterial({ side: DoubleSide });
     const cutter1Geometry = this.segmentFactory.createShellGeometry(
       curve1,
+      0.99999,
       true,
     );
-    cutter1Geometry.translate(0, -0.000001, 0);
-    const shell1Cutter = new Brush(cutter1Geometry);
+    const shell1Cutter = new Brush(cutter1Geometry, cutterMaterial);
     const cutter2Geometry = this.segmentFactory.createShellGeometry(
       curve2,
+      0.99999,
       true,
     );
-    cutter2Geometry.translate(0, -0.000001, 0);
-    const shell2Cutter = new Brush(cutter2Geometry);
-    console.log(shell1Brush);
-    console.log(shell1Cutter);
+    const shell2Cutter = new Brush(cutter2Geometry, cutterMaterial);
 
     const evaluator = new Evaluator();
     const shell1 = evaluator.evaluate(
@@ -134,14 +133,24 @@ export class JunctionFactory {
     }
 
     if (this.segmentFactory.rails) {
-      console.log(this.segmentFactory.rails);
       junctionGroup.add(...this.segmentFactory.createRails(curve1));
       junctionGroup.add(...this.segmentFactory.createRails(curve2));
     }
 
     if (this.segmentFactory.lights) {
-      junctionGroup.add(this.segmentFactory.createLights(curve1));
-      junctionGroup.add(this.segmentFactory.createLights(curve2));
+      const lights1 = this.segmentFactory.createLights(curve1);
+      lights1.children.forEach((child) => {
+        if (isPointInsideMesh(child.position, shell2Cutter))
+          child.visible = false;
+      });
+      junctionGroup.add(lights1);
+
+      const lights2 = this.segmentFactory.createLights(curve2);
+      lights2.children.forEach((child) => {
+        if (isPointInsideMesh(child.position, shell1Cutter))
+          child.visible = false;
+      });
+      junctionGroup.add(lights2);
     }
 
     junctionGroup.position.copy(curve1.offset.clone().negate());
