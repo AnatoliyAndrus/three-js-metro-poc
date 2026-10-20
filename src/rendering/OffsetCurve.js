@@ -63,6 +63,7 @@ export class OffsetCurve extends Curve {
 
   /**
    * Offsets curve, so that it's center is in 0 coordinate
+   * @returns {this}
    */
   offsetToCurveCenter() {
     this.offset = this.curve

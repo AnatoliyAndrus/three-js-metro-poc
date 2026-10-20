@@ -1,7 +1,12 @@
 "use strict";
-import metroExample from "./src/examples/metro-1.json";
-import { testFactory } from "./src/examples/tunnels/segment-factory";
-import { Vector3, Scene, WebGLRenderer, PerspectiveCamera, Euler } from "three";
+import {
+  Vector3,
+  Scene,
+  WebGLRenderer,
+  PerspectiveCamera,
+  Euler,
+  HemisphereLight,
+} from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Metro } from "./src/domain/Metro";
 import { MetroNode } from "./src/domain/MetroNode";
@@ -9,6 +14,12 @@ import { Port } from "./src/domain/Port";
 import { Tunnel } from "./src/domain/Tunnel";
 
 import { MetroRenderer } from "./src/rendering/MetroRenderer";
+import { TunnelManager } from "./src/rendering/TunnelManager";
+import {
+  createDetailedFactory,
+  createLowFactory,
+  createMediumFactory,
+} from "./src/examples/tunnels/lod-segment-factories";
 
 const container = document.querySelector(".sceneContainer");
 
@@ -21,12 +32,16 @@ const height = container.clientHeight;
 renderer.setSize(width, height);
 container.append(canvas);
 const camera = new PerspectiveCamera(90, width / height, 0.1, 10_000);
-camera.position.set(0, 10, 10);
+camera.position.set(100, 20, 20);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, 0);
+controls.target.set(100, 10, 0);
 controls.enableDamping = true;
 controls.minDistance = 10;
 controls.maxDistance = 2000;
+
+//light
+const light = new HemisphereLight(0xffffbb, 0x080820, 1);
+scene.add(light);
 
 renderer.setAnimationLoop(() => {
   controls.update();
@@ -76,7 +91,12 @@ metro.tunnels.push(tunnel);
 // //importing metro from json file
 // const metro = Metro.fromJSON(metroExample);
 
-const tunnelSegmentFactory = new testFactory();
-
-const tunnelRender = new MetroRenderer(scene, tunnelSegmentFactory);
+const tunnelRender = new MetroRenderer(
+  scene,
+  new TunnelManager(
+    createDetailedFactory(),
+    createMediumFactory(),
+    createLowFactory(),
+  ),
+);
 tunnelRender.render(metro);

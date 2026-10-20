@@ -23,69 +23,11 @@ export class JunctionFactory {
   }
 
   /**
-   * @param {MetroNode} junction data representation
+   * @param {Curve} curve1
+   * @param {Curve} curve2
    * @returns {Group}
    */
-  create(junction) {
-    if (junction.type != "junction") throw new Error("Node has to be junction");
-
-    const from = [];
-    const to = [];
-    for (let port of junction.ports) {
-      if (port.type == "from") {
-        from.push(port);
-      } else if (port.type == "to") {
-        to.push(port);
-      }
-    }
-
-    //creating curves
-    const [curve1, curve2] = (function makeCurves() {
-      let curve1, curve2;
-      if (from.length === 1 && to.length === 2) {
-        curve1 = new OffsetCurve(
-          createCurve(
-            to[0].getGlobalPosition(),
-            to[0].getGlobalDirection(),
-            from[0].getGlobalDirection().negate(),
-            from[0].getGlobalPosition(),
-          ),
-          from[0].getGlobalPosition().negate(),
-        );
-        curve2 = new OffsetCurve(
-          createCurve(
-            to[1].getGlobalPosition(),
-            to[1].getGlobalDirection(),
-            from[0].getGlobalDirection().negate(),
-            from[0].getGlobalPosition(),
-          ),
-          from[0].getGlobalPosition().negate(),
-        );
-      } else if (from.length === 2 && to.length === 1) {
-        curve1 = new OffsetCurve(
-          createCurve(
-            to[0].getGlobalPosition(),
-            to[0].getGlobalDirection(),
-            from[0].getGlobalDirection().negate(),
-            from[0].getGlobalPosition(),
-          ),
-          to[0].getGlobalPosition().negate(),
-        );
-        curve2 = new OffsetCurve(
-          createCurve(
-            to[0].getGlobalPosition(),
-            to[0].getGlobalDirection(),
-            from[1].getGlobalDirection().negate(),
-            from[1].getGlobalPosition(),
-          ),
-          to[0].getGlobalPosition().negate(),
-        );
-      } else {
-        throw new Error(`Invalid port configuration for junction`);
-      }
-      return [curve1, curve2];
-    })();
-
+  create(curve1, curve2) {
     const junctionGroup = new Group();
 
     const shell1Brush = new Brush(
@@ -153,7 +95,6 @@ export class JunctionFactory {
       junctionGroup.add(lights2);
     }
 
-    junctionGroup.position.copy(curve1.offset.clone().negate());
     return junctionGroup;
   }
 

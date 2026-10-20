@@ -3,22 +3,20 @@ import { Metro } from "../domain/Metro";
 import { createTunnelCurves } from "./render-utils";
 import { TunnelSegmentFactory } from "./TunnelSegmentFactory";
 import { JunctionFactory } from "./JunctionFactory";
+import { TunnelManager } from "./TunnelManager";
 
 export class MetroRenderer {
   #scene;
-  #tunnels = [];
-  #tunnelSegmentFactory;
-  #junctionFactory;
+  #tunnelManager;
 
   /**
    *
    * @param {THREE.Scene} scene
-   * @param {TunnelSegmentFactory} tunnelSegmentFactory
+   * @param {TunnelManager} tunnelManager
    */
-  constructor(scene, tunnelSegmentFactory) {
+  constructor(scene, tunnelManager) {
     this.#scene = scene;
-    this.#tunnelSegmentFactory = tunnelSegmentFactory;
-    this.#junctionFactory = new JunctionFactory(tunnelSegmentFactory);
+    this.#tunnelManager = tunnelManager;
   }
 
   /**
@@ -26,22 +24,6 @@ export class MetroRenderer {
    * @param {Metro} metro
    */
   render(metro) {
-    for (const tunnel of metro.tunnels) {
-      const curves = createTunnelCurves(tunnel, 0.3);
-      const tunnelSegments = [];
-      for (const curve of curves) {
-        const tunnelSegment = this.#tunnelSegmentFactory.create(curve);
-
-        tunnelSegments.push(tunnelSegment);
-        this.#scene.add(tunnelSegment);
-      }
-      this.#tunnels.push(tunnelSegments);
-    }
-
-    for (const metroNode of metro.nodes) {
-      if (metroNode.type == "junction") {
-        this.#scene.add(this.#junctionFactory.create(metroNode));
-      }
-    }
+    this.#scene.add(this.#tunnelManager.createTunnels(metro));
   }
 }

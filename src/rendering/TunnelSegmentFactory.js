@@ -199,20 +199,16 @@ export class TunnelSegmentFactory {
    * @returns {TunnelSegment}
    */
   create(curve) {
-    const offsetCurve = new OffsetCurve(curve).offsetToCurveCenter();
-
     const tunnelSegment = new TunnelSegment();
 
-    if (this.shell) tunnelSegment.addShell(this.createShell(offsetCurve));
-    if (this.floor) tunnelSegment.addFloor(this.createFloor(offsetCurve));
-    if (this.rails) tunnelSegment.addRails(this.createRails(offsetCurve));
-    if (this.sleepers)
-      tunnelSegment.addSleepers(this.createSleepers(offsetCurve));
-    if (this.lights) tunnelSegment.addLights(this.createLights(offsetCurve));
+    if (this.shell) tunnelSegment.addShell(this.createShell(curve));
+    if (this.floor) tunnelSegment.addFloor(this.createFloor(curve));
+    if (this.rails) tunnelSegment.addRails(this.createRails(curve));
+    if (this.sleepers) tunnelSegment.addSleepers(this.createSleepers(curve));
+    if (this.lights) tunnelSegment.addLights(this.createLights(curve));
 
     tunnelSegment.curve = curve;
 
-    tunnelSegment.position.copy(offsetCurve.offset.clone().negate());
     return tunnelSegment;
   }
 }
