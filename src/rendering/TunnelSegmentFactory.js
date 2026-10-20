@@ -15,7 +15,6 @@ import { Mesh } from "three";
 import { OffsetCurve } from "./OffsetCurve";
 import { TunnelLamp } from "./TunnelLamp";
 import { TunnelSegment } from "./TunnelSegment";
-import { mx_bilerp_1 } from "three/src/nodes/materialx/MaterialXNoise.js";
 
 export class TunnelSegmentFactory {
   //profile here is actually only half of profile. For geometry generation it is mirrored (x -> -x)
@@ -28,7 +27,7 @@ export class TunnelSegmentFactory {
   //offset sets position of center between rails, disanceBetween sets distance between rails
   /**@type {{profile: Vector2[], resolution: number, material: Material, offset: Vector2, distanceBetween: number}} */
   rails;
-  /**@type {{profilePoint: Vector2, resolution: number, casing: Group, light: Light}} */
+  /**@type {{profilePoint: Vector2, resolution: number, casing: Group, light: Light, lod: boolean}} */
   lights;
 
   /**
@@ -81,9 +80,10 @@ export class TunnelSegmentFactory {
 
   /**
    * @param {Curve} curve
+   * @param {boolean} lod, if true, creates ligts as LOD objects, otherwise as Group
    * @returns {Group}
    */
-  createLights(curve) {
+  createLights(curve, lod = true) {
     const matrices = getMatrixesAlongCurve(
       this.lights.profilePoint,
       this.lights.resolution,
@@ -92,7 +92,14 @@ export class TunnelSegmentFactory {
     const lamps = new Group();
 
     for (let matrix of matrices) {
-      const lamp = new TunnelLamp(this.lights.casing, this.lights.light);
+      let lamp;
+      if (lod) {
+        lamp = new TunnelLamp(this.lights.casing, this.lights.light);
+      } else {
+        lamp = new Group();
+        lamp.add(this.lights.casing.clone());
+        lamp.add(this.lights.light.clone());
+      }
 
       matrix.decompose(lamp.position, lamp.quaternion, lamp.scale);
 
@@ -209,7 +216,9 @@ export class TunnelSegmentFactory {
     if (this.rails) tunnelSegment.addRails(this.createRails(offsetCurve));
     if (this.sleepers)
       tunnelSegment.addSleepers(this.createSleepers(offsetCurve));
-    if (this.lights) tunnelSegment.addLights(this.createLights(offsetCurve));
+    if (this.lights) {
+      tunnelSegment.addLights(this.createLights(offsetCurve, this.lights.lod));
+    }
 
     tunnelSegment.curve = curve;
 

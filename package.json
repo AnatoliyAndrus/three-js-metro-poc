@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "js": "^0.1.0",
-    "three": "^0.186.1",
+    "lightmap-baker": "^1.0.0",
+    "three": "^0.185.1",
     "three-bvh-csg": "^0.0.18",
     "three-orbitcontrols": "^2.110.2",
     "uuid": "^14.0.2",

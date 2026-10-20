@@ -18,17 +18,17 @@ export class TunnelLamp extends LOD {
    */
   constructor(casing, light) {
     super();
-    this.casing = casing;
-    this.light = light;
+    this.casing = casing.clone();
+    this.light = light.clone();
 
     const close = new Group();
-    close.add(casing.clone());
-    close.add(this.light.clone());
+    close.add(this.casing);
+    close.add(this.light);
     this.addLevel(close, 0);
     this.levelGroups.push(close);
 
     const mid = new Group();
-    mid.add(casing.clone());
+    mid.add(this.casing);
     this.addLevel(mid, 20);
     this.levelGroups.push(mid);
 

@@ -138,14 +138,20 @@ export class JunctionFactory {
     }
 
     if (this.segmentFactory.lights) {
-      const lights1 = this.segmentFactory.createLights(curve1);
+      const lights1 = this.segmentFactory.createLights(
+        curve1,
+        this.segmentFactory.lights.lod,
+      );
       lights1.children.forEach((child) => {
         if (isPointInsideMesh(child.position, shell2Cutter))
           child.visible = false;
       });
       junctionGroup.add(lights1);
 
-      const lights2 = this.segmentFactory.createLights(curve2);
+      const lights2 = this.segmentFactory.createLights(
+        curve2,
+        this.segmentFactory.lights.lod,
+      );
       lights2.children.forEach((child) => {
         if (isPointInsideMesh(child.position, shell1Cutter))
           child.visible = false;
