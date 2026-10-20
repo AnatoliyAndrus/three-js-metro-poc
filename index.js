@@ -48,7 +48,7 @@ const station1Port2 = new Port(
   new Euler(0, 0, 0),
   station1,
   "from",
-  station1Port1,
+  [station1Port1],
 );
 
 const points = [

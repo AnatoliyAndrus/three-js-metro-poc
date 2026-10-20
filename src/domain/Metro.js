@@ -35,8 +35,6 @@ export class Metro {
     const ports = [];
     for (const portData of data.ports) {
       const portNode = nodes.find((node) => node.id == portData.nodeId);
-      const connectedPort =
-        ports.find((port) => portData.connectedPortId === port.id) ?? null;
 
       ports.push(
         new Port(
@@ -44,10 +42,18 @@ export class Metro {
           new Euler().fromArray(portData.localRotation),
           portNode,
           portData.type,
-          connectedPort,
+          [],
           portData.id,
         ),
       );
+    }
+    for (const port of ports) {
+      const portData = data.ports.find((portData) => portData.id === port.id);
+      if (portData.connectedPorts) {
+        portData.connectedPorts
+          .map((connectedPortId) => ports.find((p) => p.id === connectedPortId))
+          .forEach((p) => port.connectWith(p));
+      }
     }
 
     const tunnels = data.tunnels.map((tunnel) => {
@@ -72,20 +78,21 @@ export class Metro {
    * @returns {MetroNode}
    */
   addJunction(nodePosition, nodeRotationY, portsInfo) {
-    if (portsInfo?.length !== 3)
+    if (portsInfo?.length !== 3) {
       throw new Error("There are exactly 3 ports in the junction");
+    }
 
-    const to = portsInfo.filter((port) => port.type === "to");
-    const from = portsInfo.filter((port) => port.type === "from");
+    const toInfo = portsInfo.filter((port) => port.type === "to");
+    const fromInfo = portsInfo.filter((port) => port.type === "from");
 
     if (
       !(
-        (to.length === 1 && from.length === 2) ||
-        (to.length === 2 && from.length === 1)
+        (toInfo.length === 1 && fromInfo.length === 2) ||
+        (toInfo.length === 2 && fromInfo.length === 1)
       )
     ) {
       throw new Error(
-        "there must be exactly 1 port of one type and 2 of another",
+        "There must be exactly 1 port of one type and 2 of another",
       );
     }
 
@@ -97,16 +104,26 @@ export class Metro {
 
     this.nodes.push(node);
 
-    portsInfo.forEach((port) => {
-      this.ports.push(
+    const ports = portsInfo.map(
+      (info) =>
         new Port(
-          new Vector3(port.x, 0, port.z),
-          new Euler(0, port.yRotation, 0),
+          new Vector3(info.x, 0, info.z),
+          new Euler(0, info.yRotation, 0),
           node,
-          port.type,
+          info.type,
         ),
-      );
-    });
+    );
+
+    this.ports.push(...ports);
+
+    const singlePort = ports.find(
+      (port) =>
+        ports.filter((candidate) => candidate.type === port.type).length === 1,
+    );
+    const otherPorts = ports.filter((port) => port !== singlePort);
+
+    otherPorts.forEach((port) => singlePort.connectWith(port));
+
     return node;
   }
 }

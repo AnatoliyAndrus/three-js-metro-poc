@@ -15,7 +15,6 @@ import { Mesh } from "three";
 import { OffsetCurve } from "./OffsetCurve";
 import { TunnelLamp } from "./TunnelLamp";
 import { TunnelSegment } from "./TunnelSegment";
-import { mx_bilerp_1 } from "three/src/nodes/materialx/MaterialXNoise.js";
 
 export class TunnelSegmentFactory {
   //profile here is actually only half of profile. For geometry generation it is mirrored (x -> -x)

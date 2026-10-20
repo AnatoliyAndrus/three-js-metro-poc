@@ -18,15 +18,15 @@ export class Port {
   node;
   /** @type {string} type of port, 'to' or 'from' in relation to its node*/
   type;
-  /**@type {Port} */
-  connectedPort;
+  /**@type {Port[]} */
+  connectedPorts = [];
 
   /**
    * @param {Vector3} position
    * @param {Euler} rotation
    * @param {MetroNode|null} node
    * @param {String} type
-   * @param {Port} connectedPort
+   * @param {Port[]} connectedPorts
    * @param {String|null} id
    */
   constructor(
@@ -34,7 +34,7 @@ export class Port {
     localRotation = new Euler(0, 0, 0),
     node = null,
     type = "to",
-    connectedPort = null,
+    connectedPorts = [],
     id,
   ) {
     this.id = id ?? UUID.v4();
@@ -42,7 +42,10 @@ export class Port {
     this.localRotation = localRotation;
     if (node) this.setNode(node);
     this.type = type;
-    this.connectWith(connectedPort);
+
+    for (let port of connectedPorts) {
+      this.connectWith(port);
+    }
   }
 
   /**
@@ -77,17 +80,30 @@ export class Port {
    * @returns {this}
    */
   connectWith(port) {
-    if (this.connectedPort === port) return this;
+    if (this.connectedPorts.indexOf(port) >= 0) return this;
     if (port && !(port instanceof Port)) throw Error("Must be port");
 
     if (this === port) throw new Error("Cannot connect port with itself");
     if (port && this.node !== port.node)
       throw new Error("Port can't be connected to port from another node");
 
-    if (this.connectedPort) this.connectedPort.connectedPort = null;
-    this.connectedPort = port;
+    this.connectedPorts.push(port);
+    port.connectedPorts.push(this);
+    return this;
+  }
 
-    if (port) port.connectedPort = this;
+  /**
+   * @param {Port}
+   * @returns {this}
+   */
+  disconnectWith(port) {
+    const index1 = this.connectedPorts.indexOf(port);
+    if (index1 < 0) return this;
+
+    this.connectedPorts.splice(index1, 1);
+    const index2 = port.connectedPorts.indexOf(this);
+    if (index2 >= 0) port.connectedPorts.splice(index2, 1);
+
     return this;
   }
 
@@ -117,7 +133,7 @@ export class Port {
       localPosition: this.localPosition.toArray(),
       localRotation: this.localRotation.toArray(),
       nodeId: this.node?.id,
-      connectedPortId: this.connectedPort?.id,
+      connectedPorts: this.connectedPorts.map((port) => port.id),
       type: this.type,
     };
   }
