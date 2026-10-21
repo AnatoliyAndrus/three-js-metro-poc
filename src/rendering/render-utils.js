@@ -184,8 +184,8 @@ export function createGeometryAlongCurve(
 
       index.push(
         polygon[0] + lastProfileOffset,
-        polygon[1] + lastProfileOffset,
         polygon[2] + lastProfileOffset,
+        polygon[1] + lastProfileOffset,
       );
     }
   }

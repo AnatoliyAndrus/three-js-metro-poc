@@ -15,11 +15,7 @@ import { Tunnel } from "./src/domain/Tunnel";
 
 import { MetroRenderer } from "./src/rendering/MetroRenderer";
 import { TunnelManager } from "./src/rendering/TunnelManager";
-import {
-  createDetailedFactory,
-  createLowFactory,
-  createMediumFactory,
-} from "./src/examples/tunnels/lod-segment-factories";
+import { createTunnelManager } from "./src/examples/tunnels/lod-segment-factories";
 
 const container = document.querySelector(".sceneContainer");
 
@@ -78,7 +74,7 @@ const metro = new Metro();
 const junction = metro.addJunction(new Vector3(100, 10, 10), 0, [
   { x: 0, z: 0, yRotation: 0, type: "to" },
   { x: 30, z: 5, yRotation: 0, type: "from" },
-  { x: 30, z: -5, yRotation: 0, type: "from" },
+  { x: 30, z: -25, yRotation: Math.PI / 6, type: "from" },
 ]);
 
 const tunnel = new Tunnel(
@@ -91,12 +87,5 @@ metro.tunnels.push(tunnel);
 // //importing metro from json file
 // const metro = Metro.fromJSON(metroExample);
 
-const tunnelRender = new MetroRenderer(
-  scene,
-  new TunnelManager(
-    createDetailedFactory(),
-    createMediumFactory(),
-    createLowFactory(),
-  ),
-);
+const tunnelRender = new MetroRenderer(scene, createTunnelManager());
 tunnelRender.render(metro);

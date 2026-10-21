@@ -1,13 +1,20 @@
-import { LOD, Group } from "three";
+import { LOD, Group, CurvePath, Vector2, Material, Mesh } from "three";
 import { Metro } from "../domain/Metro";
 import { JunctionFactory } from "./JunctionFactory";
 import { OffsetCurve } from "./OffsetCurve";
-import { createTunnelCurves, createCurve } from "./render-utils";
+import {
+  createTunnelCurves,
+  createCurve,
+  createGeometryAlongCurve,
+} from "./render-utils";
 
 /**
  * Class that manages LOD of tunnels and junctions
  */
 export class TunnelManager {
+  /**@type {{profile: Vector2[], material: Material}} */
+  walkingPath;
+
   constructor(detailedSegmentFactory, mediumSegmentFactory, lowSegmentFactory) {
     this.detailedSegmentFactory = detailedSegmentFactory;
     this.mediumSegmentFactory = mediumSegmentFactory;
@@ -44,6 +51,15 @@ export class TunnelManager {
         segment.position.copy(curve.offset.clone().negate());
         segments.add(segment);
       }
+
+      if (this.walkingPath) {
+        const curvePath = new CurvePath();
+        curves.forEach((curve) => curvePath.add(curve));
+
+        const walkingPath = this.#createWalkingPath(curvePath, 0.2, 0.8);
+        tunnels.add(walkingPath);
+      }
+
       tunnels.add(segments);
     }
 
@@ -68,6 +84,7 @@ export class TunnelManager {
                 to[0].getGlobalDirection(),
                 from[0].getGlobalDirection().negate(),
                 from[0].getGlobalPosition(),
+                0.3,
               ),
               from[0].getGlobalPosition().negate(),
             );
@@ -77,6 +94,7 @@ export class TunnelManager {
                 to[1].getGlobalDirection(),
                 from[0].getGlobalDirection().negate(),
                 from[0].getGlobalPosition(),
+                0.3,
               ),
               from[0].getGlobalPosition().negate(),
             );
@@ -87,6 +105,7 @@ export class TunnelManager {
                 to[0].getGlobalDirection(),
                 from[0].getGlobalDirection().negate(),
                 from[0].getGlobalPosition(),
+                0.3,
               ),
               to[0].getGlobalPosition().negate(),
             );
@@ -96,6 +115,7 @@ export class TunnelManager {
                 to[0].getGlobalDirection(),
                 from[1].getGlobalDirection().negate(),
                 from[1].getGlobalPosition(),
+                0.3,
               ),
               to[0].getGlobalPosition().negate(),
             );
@@ -124,5 +144,24 @@ export class TunnelManager {
       }
     }
     return tunnels;
+  }
+
+  /**
+   *
+   * @param {Curve} curve
+   * @param {number} startU
+   * @param {number} endU
+   */
+  #createWalkingPath(curve, startU, endU) {
+    const geometry = createGeometryAlongCurve(
+      this.walkingPath.profile,
+      this.detailedSegmentFactory.shell.resolution,
+      curve,
+      false,
+      true,
+      startU,
+      endU,
+    );
+    return new Mesh(geometry, this.walkingPath.material);
   }
 }

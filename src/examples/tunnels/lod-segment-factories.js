@@ -9,6 +9,7 @@ import {
   Vector2,
 } from "three";
 import { TunnelSegmentFactory } from "../../rendering/TunnelSegmentFactory";
+import { TunnelManager } from "../../rendering/TunnelManager";
 
 export function createDetailedFactory() {
   const factory = new TunnelSegmentFactory();
@@ -169,4 +170,31 @@ function createLampCasing() {
   addWall(0.06, thickness, 0.08, 0, -halfSize, 0);
 
   return casing;
+}
+
+/**
+ *
+ * @returns {TunnelManager}
+ */
+export function createTunnelManager() {
+  const tunnelManager = new TunnelManager(
+    createDetailedFactory(),
+    createMediumFactory(),
+    createLowFactory(),
+  );
+  tunnelManager.walkingPath = {
+    profile: [
+      new Vector2(0.55, 0),
+      new Vector2(0.55, 0.15),
+      new Vector2(0.45, 0.2),
+      new Vector2(0.45, 0.25),
+      new Vector2(1.15, 0.25),
+      new Vector2(1.15, 0),
+    ],
+    material: new MeshStandardMaterial({
+      color: new Color().setRGB(0.1, 0.1, 0.15),
+      side: BackSide,
+    }),
+  };
+  return tunnelManager;
 }
