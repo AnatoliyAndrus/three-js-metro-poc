@@ -153,10 +153,33 @@ export function createGeometryAlongCurve(
         profileGlobalPoints[j].z,
       );
 
-      uvAttribute.push(
-        i / (numberOfProfiles - 1),
-        j / (profileGlobalPoints.length - 1),
-      );
+      let u = 0;
+      let v = 0;
+      if (i !== 0) {
+        const prevIIndex = pointToIndex(i - 1, j);
+        const prevIPoint = new Vector3(
+          positionAttribute[prevIIndex * 3],
+          positionAttribute[prevIIndex * 3 + 1],
+          positionAttribute[prevIIndex * 3 + 2],
+        );
+        u =
+          profileGlobalPoints[j].distanceTo(prevIPoint) +
+          uvAttribute[prevIIndex * 2];
+      }
+
+      if (j !== 0) {
+        const prevJIndex = pointToIndex(i, j - 1);
+        const prevJPoint = new Vector3(
+          positionAttribute[prevJIndex * 3],
+          positionAttribute[prevJIndex * 3 + 1],
+          positionAttribute[prevJIndex * 3 + 2],
+        );
+        v =
+          profileGlobalPoints[j].distanceTo(prevJPoint) +
+          uvAttribute[prevJIndex * 2 + 1];
+      }
+
+      uvAttribute.push(u, v);
 
       if (i > 0 && (fullTube || j > 0)) {
         const prevJ = j > 0 ? j - 1 : profile.length - 1;

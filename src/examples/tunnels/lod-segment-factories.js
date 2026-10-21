@@ -6,12 +6,21 @@ import {
   Mesh,
   MeshStandardMaterial,
   PointLight,
+  RepeatWrapping,
+  TextureLoader,
   Vector2,
 } from "three";
 import { TunnelSegmentFactory } from "../../rendering/TunnelSegmentFactory";
 import { TunnelManager } from "../../rendering/TunnelManager";
 
 export function createDetailedFactory() {
+  const ballastTexture = new TextureLoader().load(
+    "../resources/textures/ballast.jpg",
+  );
+  ballastTexture.wrapS = RepeatWrapping;
+  ballastTexture.wrapT = RepeatWrapping;
+  ballastTexture.repeat.set(0.5, 0.5);
+
   const factory = new TunnelSegmentFactory();
 
   factory.shell = {
@@ -36,8 +45,9 @@ export function createDetailedFactory() {
 
   factory.floor = {
     material: new MeshStandardMaterial({
-      color: new Color().setRGB(0.5, 0.5, 0.5),
+      color: new Color().setRGB(0.4, 0.4, 0.4),
       side: BackSide,
+      map: ballastTexture,
     }),
   };
 
