@@ -14,12 +14,16 @@ import { TunnelSegmentFactory } from "../../rendering/TunnelSegmentFactory";
 import { TunnelManager } from "../../rendering/TunnelManager";
 
 export function createDetailedFactory() {
-  const ballastTexture = new TextureLoader().load(
-    "../resources/textures/ballast.jpg",
-  );
+  const loader = new TextureLoader();
+  const ballastTexture = loader.load("../resources/textures/ballast.jpg");
   ballastTexture.wrapS = RepeatWrapping;
   ballastTexture.wrapT = RepeatWrapping;
   ballastTexture.repeat.set(0.5, 0.5);
+
+  const concreteTexture = loader.load("../resources/textures/concrete.jpg");
+  concreteTexture.wrapS = RepeatWrapping;
+  concreteTexture.wrapT = RepeatWrapping;
+  concreteTexture.repeat.set(0.5, 0.5);
 
   const factory = new TunnelSegmentFactory();
 
@@ -40,6 +44,7 @@ export function createDetailedFactory() {
     material: new MeshStandardMaterial({
       color: new Color().setRGB(0.3, 0.3, 0.5),
       side: BackSide,
+      map: concreteTexture,
     }),
   };
 
