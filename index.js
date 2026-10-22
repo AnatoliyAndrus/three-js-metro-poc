@@ -14,8 +14,7 @@ import { Port } from "./src/domain/Port";
 import { Tunnel } from "./src/domain/Tunnel";
 
 import { MetroRenderer } from "./src/rendering/MetroRenderer";
-import { TunnelManager } from "./src/rendering/TunnelManager";
-import { createTunnelManager } from "./src/examples/tunnels/lod-segment-factories";
+import { createTunnelManager } from "./src/examples/tunnels/tunnel-style";
 
 const container = document.querySelector(".sceneContainer");
 

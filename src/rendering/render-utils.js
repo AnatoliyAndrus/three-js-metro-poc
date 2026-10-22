@@ -115,6 +115,9 @@ export function createCurve(
  * @param {boolean} sealedTube whether whether first and last profiles are sealed
  * @param {number} startU where from on curve geometry starts
  * @param {number} endU where geometry stretches to
+ * @param {number} distanceOffset cumulative distance used to keep UVs continuous across chunks
+ * @param {boolean} sealStart whether to cap the start profile
+ * @param {boolean} sealEnd whether to cap the end profile
  * @returns {BufferGeometry}
  */
 export function createGeometryAlongCurve(
@@ -125,6 +128,9 @@ export function createGeometryAlongCurve(
   sealedTube = false,
   startU = 0,
   endU = 1.0,
+  distanceOffset = 0,
+  sealStart = sealedTube,
+  sealEnd = sealedTube,
 ) {
   const curvePartLength = curve.getLength() * (endU - startU);
   const numberOfProfiles = Math.ceil(resolution * curvePartLength) + 1;
@@ -153,7 +159,7 @@ export function createGeometryAlongCurve(
         profileGlobalPoints[j].z,
       );
 
-      let u = 0;
+      let u = distanceOffset;
       let v = 0;
       if (i !== 0) {
         const prevIIndex = pointToIndex(i - 1, j);
@@ -198,18 +204,23 @@ export function createGeometryAlongCurve(
     }
   }
 
-  if (sealedTube) {
-    const sealIndex = ShapeUtils.triangulateShape(profile, []);
+  if (sealStart || sealEnd) {
+    const sealIndex = ShapeUtils.triangulateShape(
+      profile.map((point) => point.clone()),
+      [],
+    );
 
     const lastProfileOffset = profile.length * (numberOfProfiles - 1);
     for (let polygon of sealIndex) {
-      index.push(polygon[0], polygon[2], polygon[1]);
+      if (sealStart) index.push(polygon[0], polygon[2], polygon[1]);
 
-      index.push(
-        polygon[0] + lastProfileOffset,
-        polygon[2] + lastProfileOffset,
-        polygon[1] + lastProfileOffset,
-      );
+      if (sealEnd) {
+        index.push(
+          polygon[0] + lastProfileOffset,
+          polygon[2] + lastProfileOffset,
+          polygon[1] + lastProfileOffset,
+        );
+      }
     }
   }
 
@@ -287,13 +298,24 @@ export function createInstancesAlongCurve(
   material,
   resolution,
   curve,
+  startU = 0,
+  endU = 1,
+  stationOrigin = 0,
 ) {
-  const matrices = getMatrixesAlongCurve(profilePoint, resolution, curve);
+  const matrices = getMatrixesAlongCurve(
+    profilePoint,
+    resolution,
+    curve,
+    startU,
+    endU,
+    stationOrigin,
+  );
   const mesh = new InstancedMesh(geometry, material, matrices.length);
 
   for (let i = 0; i < matrices.length; i++) {
     mesh.setMatrixAt(i, matrices[i]);
   }
+  mesh.instanceMatrix.needsUpdate = true;
 
   return mesh;
 }
@@ -305,12 +327,33 @@ export function createInstancesAlongCurve(
  * @param {Curve} curve
  * @returns {Matrix4[]} matrices
  */
-export function getMatrixesAlongCurve(profilePoint, resolution, curve) {
-  const count = Math.ceil(curve.getLength() * resolution);
+export function getMatrixesAlongCurve(
+  profilePoint,
+  resolution,
+  curve,
+  startU = 0,
+  endU = 1,
+  stationOrigin = 0,
+) {
+  if (!(resolution > 0)) return [];
+
+  const length = curve.getLength();
+  if (!(length > 0)) return [];
+
+  const startDistance = length * startU;
+  const endDistance = length * endU;
+  const spacing = 1 / resolution;
+  const firstStation =
+    stationOrigin +
+    Math.ceil((startDistance - stationOrigin) / spacing - 1e-9) * spacing;
   const matrices = [];
 
-  for (let i = 0; i < count; i++) {
-    const currentU = i / count;
+  for (
+    let station = firstStation;
+    station < endDistance - 1e-9;
+    station += spacing
+  ) {
+    const currentU = station / length;
     const globalPoint = getProfileGlobalPoints(
       [profilePoint],
       currentU,
@@ -324,6 +367,36 @@ export function getMatrixesAlongCurve(profilePoint, resolution, curve) {
   }
 
   return matrices;
+}
+
+/**
+ * Splits a curve into similarly sized chunks measured by arc length.
+ * The final chunk is adjusted so all chunks have nearly equal length.
+ * @param {Curve} curve
+ * @param {number} targetLength
+ */
+export function createArcLengthChunks(curve, targetLength) {
+  if (!(targetLength > 0)) {
+    throw new Error("Chunk target length must be greater than zero");
+  }
+
+  const totalLength = curve.getLength();
+  if (!(totalLength > 0)) return [];
+
+  const chunkCount = Math.ceil(totalLength / targetLength);
+  const chunkLength = totalLength / chunkCount;
+
+  return Array.from({ length: chunkCount }, (_, index) => {
+    const startDistance = index * chunkLength;
+    const endDistance =
+      index === chunkCount - 1 ? totalLength : (index + 1) * chunkLength;
+    return {
+      startDistance,
+      endDistance,
+      startU: startDistance / totalLength,
+      endU: endDistance / totalLength,
+    };
+  });
 }
 
 /**

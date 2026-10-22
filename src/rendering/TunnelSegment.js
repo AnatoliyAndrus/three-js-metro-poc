@@ -1,56 +1,27 @@
-import { Group, InstancedMesh, Mesh } from "three";
+import { Group } from "three";
 
 export class TunnelSegment extends Group {
-  shell;
-  floor;
-  rails;
-  sleepers;
-  lights;
-
-  curve;
-
-  /**
-   *
-   * @param {Mesh} shell
-   */
-  addShell(shell) {
-    this.add(shell);
-    this.shell = shell;
+  constructor(curve = null) {
+    super();
+    this.curve = curve;
+    this.featureObjects = new Map();
   }
 
-  /**
-   *
-   * @param {Mesh} floor
-   */
-  addFloor(floor) {
-    this.add(floor);
-    this.floor = floor;
-  }
+  addFeature(id, object) {
+    if (!object) return this;
+    if (this.featureObjects.has(id)) {
+      throw new Error(`Feature '${id}' was added to this segment twice`);
+    }
 
-  /**
-   *
-   * @param {Mesh[]} rails
-   */
-  addRails(rails) {
-    for (let rail of rails) this.add(rail);
-    this.rails = rails;
-  }
-
-  /**
-   *
-   * @param {InstancedMesh} sleepers
-   */
-  addSleepers(sleepers) {
-    this.sleepers = sleepers;
-    this.add(sleepers);
-  }
-
-  /**
-   *
-   * @param {Group} lights
-   */
-  addLights(lights) {
-    this.lights = lights;
-    this.add(lights);
+    let featureObject = object;
+    if (Array.isArray(object)) {
+      featureObject = new Group();
+      for (const child of object) {
+        if (child) featureObject.add(child);
+      }
+    }
+    this.featureObjects.set(id, featureObject);
+    this.add(featureObject);
+    return this;
   }
 }
