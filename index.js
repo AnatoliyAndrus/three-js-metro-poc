@@ -3,9 +3,6 @@ import { Vector3, Scene, WebGLRenderer, PerspectiveCamera, Euler, HemisphereLigh
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { Metro } from "./src/domain/Metro";
-import { MetroNode } from "./src/domain/MetroNode";
-import { Port } from "./src/domain/Port";
-import { Tunnel } from "./src/domain/Tunnel";
 
 import { MetroRenderer } from "./src/rendering/MetroRenderer";
 
@@ -40,9 +37,10 @@ renderer.setAnimationLoop(() => {
 });
 
 // //importing metro from json file
-// const metro = Metro.fromJSON(metroExample);
+import * as metroJSON from "./src/examples/metro-1.json";
+const metro = Metro.fromJSON(metroJSON);
 
-const metro = createMetro();
+// const metro = createMetro();
 
 const tunnelRender = new MetroRenderer(scene, createTunnelManager());
 tunnelRender.render(metro);

@@ -7,6 +7,7 @@ import { WalkingPathFeature } from "../../rendering/tunnels/features/WalkingPath
 import { RailsFeature } from "../../rendering/tunnels/features/RailsFeature";
 import { SleepersFeature } from "../../rendering/tunnels/features/SleepersFeature";
 import { LightsFeature } from "../../rendering/tunnels/features/LightsFeature";
+import { LightPool } from "../../rendering/LightPool";
 
 /** Example style with one set of features providing all LOD variants. */
 export function createTunnelStyle() {
@@ -122,12 +123,12 @@ export function createTunnelStyle() {
   });
 
   const lights = new LightsFeature({
+    lightPool: new LightPool(new PointLight(0xffd6a0, 2, 6, 2)),
     variants: {
       detailed: {
         profilePoint: new Vector2(1.08, 0.38),
         resolution: 0.2,
         casing: createLampCasing(),
-        light: new PointLight(0xffd6a0, 2, 6, 2),
         lodLevels: [
           { id: "near", distance: 0 },
           { id: "middle", distance: 20 },
@@ -147,7 +148,7 @@ export function createTunnelStyle() {
     variants: {
       detailed: { resolution: 2.5, material: walkwayMaterial },
       medium: { resolution: 1.25, material: walkwayMaterial },
-      // low: { resolution: 0.6, material: walkwayMaterial },
+      low: { resolution: 0.6, material: walkwayMaterial },
     },
   });
 

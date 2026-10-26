@@ -1,48 +1,64 @@
 {
   "nodes": [
-    {
-      "id": "58c22268-71b8-4c8a-b343-07a4417a0aa7",
-      "position": [0, 0, 0],
-      "rotation": [0, 0, 0, "XYZ"],
-      "type": "station"
-    },
-    {
-      "id": "584c37d9-d041-4781-9b16-59b1c4cb3c2c",
-      "position": [100, 0, 10],
-      "rotation": [0, 0, 0, "XYZ"],
-      "type": "station"
-    }
+    { "id": "96f90a7d-7a28-49b5-bbac-640f491bf74d", "position": [100, 3, 10], "rotation": [0, 0, 0, "XYZ"], "type": "junction" },
+    { "id": "36a60827-6064-445d-92c6-79c3b84e4bf6", "position": [0, 0, 0], "rotation": [0, 0, 0, "XYZ"], "type": "station" },
+    { "id": "ddd9e9f7-a856-449b-9cb7-355d7c7e6595", "position": [140, 0, 10], "rotation": [0, 0, 0, "XYZ"], "type": "station" }
   ],
   "ports": [
     {
-      "id": "41302f78-9fe6-4856-b3d5-969af970eebb",
-      "localPosition": [-1, 0, -1],
+      "id": "8f312395-cd2c-4af2-ad42-6e3d7e97a923",
+      "localPosition": [0, 0, 0],
       "localRotation": [0, 0, 0, "XYZ"],
-      "nodeId": "58c22268-71b8-4c8a-b343-07a4417a0aa7",
-      "connectedPortId": "3a58d46c-f4cc-4e4d-89bc-c491cd300478",
+      "nodeId": "96f90a7d-7a28-49b5-bbac-640f491bf74d",
+      "connectedPorts": ["077d7783-0c2e-49e8-bd36-8b6b34bacfe4", "b8ae7e8b-d946-4516-8ce9-9aa55b6fd419"],
       "type": "to"
     },
     {
-      "id": "3a58d46c-f4cc-4e4d-89bc-c491cd300478",
-      "localPosition": [1, 0, -1],
+      "id": "077d7783-0c2e-49e8-bd36-8b6b34bacfe4",
+      "localPosition": [30, 0, 5],
       "localRotation": [0, 0, 0, "XYZ"],
-      "nodeId": "58c22268-71b8-4c8a-b343-07a4417a0aa7",
-      "connectedPortId": "41302f78-9fe6-4856-b3d5-969af970eebb",
+      "nodeId": "96f90a7d-7a28-49b5-bbac-640f491bf74d",
+      "connectedPorts": ["8f312395-cd2c-4af2-ad42-6e3d7e97a923"],
       "type": "from"
     },
     {
-      "id": "d2829147-a7a1-4d69-8490-616f90ad2dfa",
+      "id": "b8ae7e8b-d946-4516-8ce9-9aa55b6fd419",
+      "localPosition": [30, 0, -25],
+      "localRotation": [0, 0.5235987755982988, 0, "XYZ"],
+      "nodeId": "96f90a7d-7a28-49b5-bbac-640f491bf74d",
+      "connectedPorts": ["8f312395-cd2c-4af2-ad42-6e3d7e97a923"],
+      "type": "from"
+    },
+    {
+      "id": "1e1fe24d-ff52-42a0-8b4c-39f179b0ea39",
       "localPosition": [-1, 0, -1],
       "localRotation": [0, 0, 0, "XYZ"],
-      "nodeId": "584c37d9-d041-4781-9b16-59b1c4cb3c2c",
+      "nodeId": "36a60827-6064-445d-92c6-79c3b84e4bf6",
+      "connectedPorts": ["bb77525b-252c-482f-a79c-f7ac582a4285"],
+      "type": "to"
+    },
+    {
+      "id": "bb77525b-252c-482f-a79c-f7ac582a4285",
+      "localPosition": [1, 0, -1],
+      "localRotation": [0, 0, 0, "XYZ"],
+      "nodeId": "36a60827-6064-445d-92c6-79c3b84e4bf6",
+      "connectedPorts": ["1e1fe24d-ff52-42a0-8b4c-39f179b0ea39"],
+      "type": "from"
+    },
+    {
+      "id": "4eb5a7aa-7080-4735-b354-d96c0b5c1bf6",
+      "localPosition": [-1, 0, 0],
+      "localRotation": [0, 0, 0, "XYZ"],
+      "nodeId": "ddd9e9f7-a856-449b-9cb7-355d7c7e6595",
+      "connectedPorts": [],
       "type": "to"
     }
   ],
   "tunnels": [
     {
-      "id": "06e6c5a0-7305-45f2-b616-0307a3ed775e",
-      "fromId": "3a58d46c-f4cc-4e4d-89bc-c491cd300478",
-      "toId": "d2829147-a7a1-4d69-8490-616f90ad2dfa",
+      "id": "1845e098-24be-46b9-9560-51b66b5039c3",
+      "fromId": "bb77525b-252c-482f-a79c-f7ac582a4285",
+      "toId": "8f312395-cd2c-4af2-ad42-6e3d7e97a923",
       "points": [
         [10, 0, 3],
         [20, 0.5, 10],
@@ -50,6 +66,7 @@
         [50, 1, 15],
         [70, 0, 7]
       ]
-    }
+    },
+    { "id": "bf57620c-ceb7-4666-9626-496958812ede", "fromId": "077d7783-0c2e-49e8-bd36-8b6b34bacfe4", "toId": "4eb5a7aa-7080-4735-b354-d96c0b5c1bf6", "points": [] }
   ]
 }
