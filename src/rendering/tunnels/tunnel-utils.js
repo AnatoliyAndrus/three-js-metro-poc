@@ -1,17 +1,6 @@
 "use strict";
-import {
-  CubicBezierCurve3,
-  Vector3,
-  Vector2,
-  BufferGeometry,
-  BufferAttribute,
-  Matrix4,
-  InstancedMesh,
-  ShapeUtils,
-  Curve,
-  Mesh,
-} from "three";
-import { Tunnel } from "../domain/Tunnel";
+import { CubicBezierCurve3, Vector3, Vector2, BufferGeometry, BufferAttribute, Matrix4, InstancedMesh, ShapeUtils, Curve, Mesh } from "three";
+import { Tunnel } from "../../domain/Tunnel";
 import { Raycaster } from "three";
 /**
  * Creates array of curves and their positions
@@ -52,22 +41,11 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
       endDirection.copy(toDirection).negate();
     } else {
       endPoint.copy(tunnel.points[i]);
-      let nextPoint =
-        i === tunnel.points.length - 1
-          ? toGlobalPosition.clone()
-          : tunnel.points[i + 1].clone();
+      let nextPoint = i === tunnel.points.length - 1 ? toGlobalPosition.clone() : tunnel.points[i + 1].clone();
       endDirection = startPoint.clone().sub(nextPoint).normalize();
       prevEndDirection = endDirection.clone();
     }
-    curves.push(
-      createCurve(
-        startPoint,
-        startDirection,
-        endDirection,
-        endPoint,
-        curvature,
-      ),
-    );
+    curves.push(createCurve(startPoint, startDirection, endDirection, endPoint, curvature));
   }
   return curves;
 }
@@ -81,13 +59,7 @@ export function createTunnelCurves(tunnel, curvature = 0.3) {
  * @param {number} curvature
  * @returns {CubicBezierCurve3} curve
  */
-export function createCurve(
-  startPoint,
-  startDirection,
-  endDirection,
-  endPoint,
-  curvature = 0.3,
-) {
+export function createCurve(startPoint, startDirection, endDirection, endPoint, curvature = 0.3) {
   const distanceBetweenStartEnd = endPoint.clone().sub(startPoint).length();
   const controlPoint1 = startDirection
     .clone()
@@ -97,12 +69,7 @@ export function createCurve(
     .clone()
     .multiplyScalar(distanceBetweenStartEnd * curvature)
     .add(endPoint);
-  return new CubicBezierCurve3(
-    startPoint,
-    controlPoint1,
-    controlPoint2,
-    endPoint,
-  );
+  return new CubicBezierCurve3(startPoint, controlPoint1, controlPoint2, endPoint);
 }
 
 /**
@@ -111,21 +78,16 @@ export function createCurve(
  * @param {Vector2[]} profile set of points that define profile. May be asymmetric.
  * @param {number} resolution number of profiles per unit of length
  * @param {Curve} curve
- * @param {boolean} fullTube whether first and last points of profiles are connected
- * @param {boolean} sealedTube whether whether first and last profiles are sealed
+ * @param {boolean} tube whether first and last points of profiles are connected
+ * @param {boolean} sealedStart whether start of geometry is sealed
+ * @param {boolean} sealedEnd whether end of geometry is sealed
  * @param {number} startU where from on curve geometry starts
  * @param {number} endU where geometry stretches to
  * @returns {BufferGeometry}
  */
-export function createGeometryAlongCurve(
-  profile,
-  resolution,
-  curve,
-  fullTube = false,
-  sealedTube = false,
-  startU = 0,
-  endU = 1.0,
-) {
+export function createGeometryAlongCurve(profile, resolution, curve, tube = false, sealedStart = false, sealedEnd = false, startU = 0, endU = 1.0) {
+  if (startU >= endU) throw new Error("startU can't be greater of equal to endU");
+
   const curvePartLength = curve.getLength() * (endU - startU);
   const numberOfProfiles = Math.ceil(resolution * curvePartLength) + 1;
 
@@ -141,86 +103,52 @@ export function createGeometryAlongCurve(
   for (let i = 0; i < numberOfProfiles; i++) {
     // for i == 0 currentU == startU, for i == (numberOfProfiles - 1) currentU == endU
     const currentU = (i / (numberOfProfiles - 1)) * (endU - startU) + startU;
-    const profileGlobalPoints = getProfileGlobalPoints(
-      profile,
-      currentU,
-      curve,
-    );
+    const profileGlobalPoints = getProfileGlobalPoints(profile, currentU, curve);
     for (let j = 0; j < profileGlobalPoints.length; j++) {
-      positionAttribute.push(
-        profileGlobalPoints[j].x,
-        profileGlobalPoints[j].y,
-        profileGlobalPoints[j].z,
-      );
+      positionAttribute.push(profileGlobalPoints[j].x, profileGlobalPoints[j].y, profileGlobalPoints[j].z);
 
       let u = 0;
       let v = 0;
       if (i !== 0) {
         const prevIIndex = pointToIndex(i - 1, j);
-        const prevIPoint = new Vector3(
-          positionAttribute[prevIIndex * 3],
-          positionAttribute[prevIIndex * 3 + 1],
-          positionAttribute[prevIIndex * 3 + 2],
-        );
-        u =
-          profileGlobalPoints[j].distanceTo(prevIPoint) +
-          uvAttribute[prevIIndex * 2];
+        const prevIPoint = new Vector3(positionAttribute[prevIIndex * 3], positionAttribute[prevIIndex * 3 + 1], positionAttribute[prevIIndex * 3 + 2]);
+        u = profileGlobalPoints[j].distanceTo(prevIPoint) + uvAttribute[prevIIndex * 2];
       }
 
       if (j !== 0) {
         const prevJIndex = pointToIndex(i, j - 1);
-        const prevJPoint = new Vector3(
-          positionAttribute[prevJIndex * 3],
-          positionAttribute[prevJIndex * 3 + 1],
-          positionAttribute[prevJIndex * 3 + 2],
-        );
-        v =
-          profileGlobalPoints[j].distanceTo(prevJPoint) +
-          uvAttribute[prevJIndex * 2 + 1];
+        const prevJPoint = new Vector3(positionAttribute[prevJIndex * 3], positionAttribute[prevJIndex * 3 + 1], positionAttribute[prevJIndex * 3 + 2]);
+        v = profileGlobalPoints[j].distanceTo(prevJPoint) + uvAttribute[prevJIndex * 2 + 1];
       }
 
       uvAttribute.push(u, v);
 
-      if (i > 0 && (fullTube || j > 0)) {
+      if (i > 0 && (tube || j > 0)) {
         const prevJ = j > 0 ? j - 1 : profile.length - 1;
         //pushing two polygons into index
-        index.push(
-          pointToIndex(i, j),
-          pointToIndex(i - 1, prevJ),
-          pointToIndex(i - 1, j),
-        );
-        index.push(
-          pointToIndex(i, j),
-          pointToIndex(i, prevJ),
-          pointToIndex(i - 1, prevJ),
-        );
+        index.push(pointToIndex(i, j), pointToIndex(i - 1, prevJ), pointToIndex(i - 1, j));
+        index.push(pointToIndex(i, j), pointToIndex(i, prevJ), pointToIndex(i - 1, prevJ));
       }
     }
   }
 
-  if (sealedTube) {
+  if (sealedStart || sealedEnd) {
     const sealIndex = ShapeUtils.triangulateShape(profile, []);
 
     const lastProfileOffset = profile.length * (numberOfProfiles - 1);
     for (let polygon of sealIndex) {
-      index.push(polygon[0], polygon[2], polygon[1]);
+      if (sealedStart) {
+        index.push(polygon[0], polygon[1], polygon[2]);
+      }
 
-      index.push(
-        polygon[0] + lastProfileOffset,
-        polygon[2] + lastProfileOffset,
-        polygon[1] + lastProfileOffset,
-      );
+      if (sealedEnd) {
+        index.push(polygon[0] + lastProfileOffset, polygon[2] + lastProfileOffset, polygon[1] + lastProfileOffset);
+      }
     }
   }
 
-  geometry.setAttribute(
-    "position",
-    new BufferAttribute(new Float32Array(positionAttribute), 3),
-  );
-  geometry.setAttribute(
-    "uv",
-    new BufferAttribute(new Float32Array(uvAttribute), 2),
-  );
+  geometry.setAttribute("position", new BufferAttribute(new Float32Array(positionAttribute), 3));
+  geometry.setAttribute("uv", new BufferAttribute(new Float32Array(uvAttribute), 2));
   geometry.setIndex(index);
 
   geometry.computeVertexNormals();
@@ -261,12 +189,7 @@ export function getProfileGlobalPoints(localPoints, u, curve) {
   const globalPoints = [];
 
   for (let localPoint of localPoints) {
-    globalPoints.push(
-      frame.point
-        .clone()
-        .addScaledVector(frame.side, localPoint.x)
-        .addScaledVector(frame.localUp, localPoint.y),
-    );
+    globalPoints.push(frame.point.clone().addScaledVector(frame.side, localPoint.x).addScaledVector(frame.localUp, localPoint.y));
   }
   return globalPoints;
 }
@@ -279,16 +202,12 @@ export function getProfileGlobalPoints(localPoints, u, curve) {
  * @param {Material} material
  * @param {number} resolution number of instances per unit of length
  * @param {Curve} curve
+ * @param {number} startU
+ * @param {number} endU
  * @returns {InstancedMesh} created instances
  */
-export function createInstancesAlongCurve(
-  profilePoint,
-  geometry,
-  material,
-  resolution,
-  curve,
-) {
-  const matrices = getMatrixesAlongCurve(profilePoint, resolution, curve);
+export function createInstancesAlongCurve(profilePoint, geometry, material, resolution, curve, startU = 0, endU = 1) {
+  const matrices = getMatrixesAlongCurve(profilePoint, resolution, curve, startU, endU);
   const mesh = new InstancedMesh(geometry, material, matrices.length);
 
   for (let i = 0; i < matrices.length; i++) {
@@ -303,19 +222,17 @@ export function createInstancesAlongCurve(
  * @param {Vector2} profilePoint
  * @param {number} resolution
  * @param {Curve} curve
+ * @param {number} startU
+ * @param {number} endU
  * @returns {Matrix4[]} matrices
  */
-export function getMatrixesAlongCurve(profilePoint, resolution, curve) {
-  const count = Math.ceil(curve.getLength() * resolution);
+export function getMatrixesAlongCurve(profilePoint, resolution, curve, startU = 0, endU = 1) {
+  const count = Math.ceil(curve.getLength() * (endU - startU) * resolution);
   const matrices = [];
 
   for (let i = 0; i < count; i++) {
-    const currentU = i / count;
-    const globalPoint = getProfileGlobalPoints(
-      [profilePoint],
-      currentU,
-      curve,
-    )[0];
+    const currentU = startU + (i / count) * (endU - startU);
+    const globalPoint = getProfileGlobalPoints([profilePoint], currentU, curve)[0];
     const frame = getCurveFrame(currentU, curve);
     const matrix = new Matrix4();
     matrix.makeBasis(frame.side, frame.localUp, frame.tangent);
@@ -339,4 +256,49 @@ export function isPointInsideMesh(point, mesh) {
   const hits = raycaster.intersectObject(mesh);
 
   return hits.length % 2 == 1;
+}
+
+/**
+ * Creates full symmetrical profile out of half profile
+ * @param {Vector2[]} halfProfile
+ * @param {number} scale
+ * @returns {Vector2[]} full profile
+ */
+export function getFullProfile(halfProfile, scale = 1) {
+  const fullProfile = halfProfile.map((point) => new Vector2(point.x * scale, point.y * scale));
+  for (let i = halfProfile.length - 1; i >= 0; i--) {
+    fullProfile.push(new Vector2(-halfProfile[i].x * scale, halfProfile[i].y * scale));
+  }
+  return fullProfile;
+}
+
+/**
+ *
+ * @param {Curve} curve
+ * @param {number} targetLength
+ * @returns {{startU, endU}[]} segments
+ */
+export function createCurveSegments(curve, targetLength) {
+  if (!(targetLength > 0)) {
+    throw new Error("Segment target length must be greater than zero");
+  }
+
+  const totalLength = curve.getLength();
+  if (!(totalLength > 0)) return [];
+
+  const segmentCount = Math.ceil(totalLength / targetLength);
+  const segmentLength = totalLength / segmentCount;
+
+  const segments = [];
+
+  for (let i = 0; i < segmentCount; i++) {
+    const startDistance = i * segmentLength;
+    const endDistance = i === segmentCount - 1 ? totalLength : (i + 1) * segmentLength;
+    segments.push({
+      startU: startDistance / totalLength,
+      endU: endDistance / totalLength,
+    });
+  }
+
+  return segments;
 }

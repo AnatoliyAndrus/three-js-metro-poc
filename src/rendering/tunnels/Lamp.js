@@ -3,14 +3,11 @@ import { BufferGeometry, Group, Light, LOD, Material, Mesh } from "three";
 /**
  * For now, LoD of lamp is managed automatically
  */
-export class TunnelLamp extends LOD {
+export class Lamp extends LOD {
   /**@type {Group} */
   casing;
   /**@type {Light} */
   light;
-
-  /**@type {Group[]} */
-  levelGroups = [];
 
   /**
    * @param {Group} casing
@@ -25,15 +22,12 @@ export class TunnelLamp extends LOD {
     close.add(casing.clone());
     close.add(this.light.clone());
     this.addLevel(close, 0);
-    this.levelGroups.push(close);
 
     const mid = new Group();
     mid.add(casing.clone());
     this.addLevel(mid, 20);
-    this.levelGroups.push(mid);
 
     const far = new Group();
     this.addLevel(far, 50);
-    this.levelGroups.push(far);
   }
 }
