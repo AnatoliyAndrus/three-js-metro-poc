@@ -22,7 +22,8 @@ export class FloorFeature extends Feature {
     if (!variant) return null;
 
     const geometry = createGeometryAlongCurve(this.profile, variant.resolution, curve, false, false, false, options.startU, options.endU);
-    return new Mesh(geometry, variant.material);
+    const floor = new Mesh(geometry, variant.material);
+    return floor;
   }
 
   /**

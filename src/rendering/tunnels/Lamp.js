@@ -32,9 +32,6 @@ export class Lamp extends LOD {
     const mid = new Group();
     mid.add(casing.clone());
     this.addLevel(mid, 20);
-
-    const far = new Group();
-    this.addLevel(far, 50);
   }
 
   update(camera) {

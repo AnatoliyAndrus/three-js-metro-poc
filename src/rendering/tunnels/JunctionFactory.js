@@ -24,22 +24,15 @@ export class JunctionFactory {
     }
   }
 
-  /**
-   * creates junction for given curves.
-   * @param {Curve} curve1 First curve of junction. First feature assembler is applied to this branch
-   * @param {Curve} curve2 Second curve of junction. Second feature assembler is applied to this branch
-   * @param {string} lodLevel
-   * @param {object | null} options
-   * @returns
-   */
-  create(curve1, curve2, lodLevel, options = {}) {
+  create(config1, config2, lodLevel, options = {}) {
     const group = new Group();
 
-    const cutter1 = this.shellFeature1.createCutter(curve1, lodLevel);
-    const cutter2 = this.shellFeature2.createCutter(curve2, lodLevel);
+    const cutter1 = this.shellFeature1.createCutter(config1.curve, lodLevel);
+    const cutter2 = this.shellFeature2.createCutter(config2.curve, lodLevel);
 
-    const segment1 = this.featureAssembler1.buildJunctionSegment(curve1, lodLevel, { cutter: cutter2, ...options });
-    const segment2 = this.featureAssembler2.buildJunctionSegment(curve2, lodLevel, { cutter: cutter1, verticalOffset: 0.0005, ...options });
+    const segment1 = this.featureAssembler1.buildJunctionSegment(config1.curve, lodLevel, { cutter: cutter2, isLeft: config1.isLeft, ...options });
+
+    const segment2 = this.featureAssembler2.buildJunctionSegment(config2.curve, lodLevel, { cutter: cutter1, isLeft: config2.isLeft, verticalOffset: 0.0005, ...options });
 
     group.add(segment1, segment2);
     return group;

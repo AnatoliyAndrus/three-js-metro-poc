@@ -14,7 +14,7 @@ export class SleepersFeature extends Feature {
     const variant = this.getVariant(lodLevel);
     if (!variant) return null;
 
-    return createInstancesAlongCurve(this.profilePoint, variant.geometry, variant.material, variant.resolution, curve, options.startU ?? 0, options.endU ?? 1, 0);
+    return createInstancesAlongCurve(this.profilePoint, variant.geometry, variant.material, variant.resolution, curve, options.startU ?? 0, options.endU ?? 1);
   }
 
   buildJunction(curve, lodLevel, options) {

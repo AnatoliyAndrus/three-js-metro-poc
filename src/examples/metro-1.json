@@ -2,7 +2,7 @@
   "nodes": [
     { "id": "96f90a7d-7a28-49b5-bbac-640f491bf74d", "position": [100, 3, 10], "rotation": [0, 0, 0, "XYZ"], "type": "junction" },
     { "id": "36a60827-6064-445d-92c6-79c3b84e4bf6", "position": [0, 0, 0], "rotation": [0, 0, 0, "XYZ"], "type": "station" },
-    { "id": "ddd9e9f7-a856-449b-9cb7-355d7c7e6595", "position": [140, 0, 10], "rotation": [0, 0, 0, "XYZ"], "type": "station" }
+    { "id": "ddd9e9f7-a856-449b-9cb7-355d7c7e6595", "position": [160, 0, 10], "rotation": [0, 0, 0, "XYZ"], "type": "station" }
   ],
   "ports": [
     {
@@ -23,7 +23,7 @@
     },
     {
       "id": "b8ae7e8b-d946-4516-8ce9-9aa55b6fd419",
-      "localPosition": [30, 0, -25],
+      "localPosition": [30, 0, 25],
       "localRotation": [0, 0.5235987755982988, 0, "XYZ"],
       "nodeId": "96f90a7d-7a28-49b5-bbac-640f491bf74d",
       "connectedPorts": ["8f312395-cd2c-4af2-ad42-6e3d7e97a923"],

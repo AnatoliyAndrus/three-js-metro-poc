@@ -1,4 +1,4 @@
-import { CurvePath, Group } from "three";
+import { CurvePath, Group, Vector3 } from "three";
 import { JunctionFactory } from "./JunctionFactory";
 import { LodAssembler } from "./LodAssembler";
 import { OffsetCurve } from "../OffsetCurve";
@@ -40,42 +40,75 @@ export class TunnelManager {
         lod.position.copy(center);
         segments.add(lod);
       }
-
+      segments.userData.curve = path;
       tunnels.add(segments);
     }
 
     for (const metroNode of metro.nodes) {
       if (metroNode.type !== "junction") continue;
 
-      const [curve1, curve2] = this.#createJunctionCurves(metroNode);
-      const junctionLod = this.lodAssembler.create((level) => this.junctionFactory.create(curve1, curve2, level));
-      junctionLod.position.copy(curve1.offset.clone().negate());
+      const [config1, config2] = this.#createJunctionConfigs(metroNode);
+      const junctionLod = this.lodAssembler.create((level) => this.junctionFactory.create(config1, config2, level));
+      junctionLod.position.copy(config1.curve.offset.clone().negate());
       tunnels.add(junctionLod);
     }
 
     return tunnels;
   }
 
-  #createJunctionCurves(metroNode) {
+  #createJunctionConfigs(metroNode) {
     const from = metroNode.ports.filter((port) => port.type === "from");
     const to = metroNode.ports.filter((port) => port.type === "to");
 
     if (from.length === 1 && to.length === 2) {
       const origin = from[0].getGlobalPosition();
-      return [
-        new OffsetCurve(createCurve(to[0].getGlobalPosition(), to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), origin.clone().negate()),
-        new OffsetCurve(createCurve(to[1].getGlobalPosition(), to[1].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), origin.clone().negate()),
-      ];
+      const firstLeft = isLeft(to[1].localPosition, from[0].localPosition, to[0].localPosition);
+      const config1 = {
+        to: to[0],
+        from: from[0],
+        curve: new OffsetCurve(createCurve(to[0].getGlobalPosition(), to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), origin.clone().negate()),
+        isLeft: firstLeft,
+      };
+      const config2 = {
+        to: to[1],
+        from: from[0],
+        curve: new OffsetCurve(createCurve(to[1].getGlobalPosition(), to[1].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), origin.clone().negate()),
+        isLeft: !firstLeft,
+      };
+      return [config1, config2];
     }
 
     if (from.length === 2 && to.length === 1) {
       const origin = to[0].getGlobalPosition();
-      return [
-        new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), from[0].getGlobalPosition(), 0.3), origin.clone().negate()),
-        new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[1].getGlobalDirection().negate(), from[1].getGlobalPosition(), 0.3), origin.clone().negate()),
-      ];
+      const firstLeft = isLeft(to[0].localPosition, from[1].localPosition, from[0].localPosition);
+      const config1 = {
+        to: to[0],
+        from: from[0],
+        curve: new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), from[0].getGlobalPosition(), 0.3), origin.clone().negate()),
+        isLeft: firstLeft,
+      };
+      const config2 = {
+        to: to[0],
+        from: from[1],
+        curve: new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[1].getGlobalDirection().negate(), from[1].getGlobalPosition(), 0.3), origin.clone().negate()),
+        isLeft: !firstLeft,
+      };
+      return [config1, config2];
     }
 
     throw new Error("Invalid port configuration for junction");
   }
+}
+
+/**
+ * returns true if point c is left relative to segment ab. Disregards y coordinate
+ * @param {Vector3} a
+ * @param {Vector3} b
+ * @param {Vector3} c
+ * @returns {boolean}
+ */
+function isLeft(a, b, c) {
+  const cross = (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
+
+  return cross < 0;
 }

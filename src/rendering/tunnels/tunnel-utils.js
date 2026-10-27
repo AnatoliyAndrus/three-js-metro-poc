@@ -109,11 +109,8 @@ export function createGeometryAlongCurve(profile, resolution, curve, tube = fals
 
       let u = 0;
       let v = 0;
-      if (i !== 0) {
-        const prevIIndex = pointToIndex(i - 1, j);
-        const prevIPoint = new Vector3(positionAttribute[prevIIndex * 3], positionAttribute[prevIIndex * 3 + 1], positionAttribute[prevIIndex * 3 + 2]);
-        u = profileGlobalPoints[j].distanceTo(prevIPoint) + uvAttribute[prevIIndex * 2];
-      }
+
+      u = curve.getLength() * (endU - startU) * (i / (numberOfProfiles - 1));
 
       if (j !== 0) {
         const prevJIndex = pointToIndex(i, j - 1);

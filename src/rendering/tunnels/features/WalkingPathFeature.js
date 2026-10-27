@@ -28,7 +28,8 @@ export class WalkingPathFeature extends Feature {
 
     const geometry = createGeometryAlongCurve(this.profile, variant.resolution, curve, false, startsAtPathStart, endsAtPathEnd, startU, endU);
 
-    return new Mesh(geometry, variant.material);
+    const walkingPath = new Mesh(geometry, variant.material);
+    return walkingPath;
   }
 
   buildJunction(curve, lodLevel, options) {

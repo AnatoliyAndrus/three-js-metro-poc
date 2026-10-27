@@ -17,7 +17,7 @@ export function createMetro() {
   const points = [new Vector3(10, 0, 3), new Vector3(20, 0.5, 10), new Vector3(40, 1, 13), new Vector3(50, 1, 15), new Vector3(70, 0, 7)];
 
   const metro = new Metro();
-  const junction = metro.addJunction(new Vector3(100, 3, 10), 0, [
+  const junction = metro.addJunction(new Vector3(160, 3, 10), 0, [
     { x: 0, z: 0, yRotation: 0, type: "to" },
     { x: 30, z: 5, yRotation: 0, type: "from" },
     { x: 30, z: -25, yRotation: Math.PI / 6, type: "from" },

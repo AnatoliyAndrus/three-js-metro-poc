@@ -36,7 +36,7 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 
-// //importing metro from json file
+// importing metro from json file
 import * as metroJSON from "./src/examples/metro-1.json";
 const metro = Metro.fromJSON(metroJSON);
 
