@@ -6,11 +6,16 @@ import { Light } from "three";
 export class LightPool {
   /**
    * @param {Light} lightInstance
+   * @param {number} initialCount how many light sources will be created initially
    */
-  constructor(lightInstance) {
+  constructor(lightInstance, initialCount = 10) {
     this.lightInstance = lightInstance;
 
     this.free = [];
+    for (let i = 0; i < initialCount; i++) {
+      const light = this.lightInstance.clone();
+      this.free.push(light);
+    }
     this.inUse = new Set();
   }
 

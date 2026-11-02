@@ -24,6 +24,8 @@ import { SleepersFeature } from "../../rendering/tunnels/features/SleepersFeatur
 import { LightsFeature } from "../../rendering/tunnels/features/LightsFeature";
 import { LightPool } from "../../rendering/LightPool";
 import { PipeFeature } from "../../rendering/tunnels/features/PipeFeature";
+import { FireExitFeature } from "../../rendering/tunnels/features/FireExitFeature";
+import { createFireExit } from "./fire-exit-room";
 
 /** Example style with one set of features providing all LOD variants. */
 export function createTunnelStyle() {
@@ -155,10 +157,9 @@ export function createTunnelStyle() {
 
   const walkwayMaterial = new MeshStandardMaterial({
     color: new Color().setRGB(0.1, 0.1, 0.15),
-    side: BackSide,
   });
   const walkingPath = new WalkingPathFeature({
-    profile: [new Vector2(0.55, 0), new Vector2(0.55, 0.15), new Vector2(0.45, 0.2), new Vector2(0.45, 0.25), new Vector2(1.15, 0.25), new Vector2(1.15, 0)],
+    profile: [new Vector2(1.15, 0), new Vector2(1.15, 0.25), new Vector2(0.45, 0.25), new Vector2(0.45, 0.2), new Vector2(0.55, 0.15), new Vector2(0.55, 0)],
     range: { startU: 0.2, endU: 0.8 },
     variants: {
       detailed: { resolution: 2.5, material: walkwayMaterial },
@@ -170,13 +171,13 @@ export function createTunnelStyle() {
   const pipeMaterial = new MeshStandardMaterial({
     color: 0x545961,
   });
-  const fastenerGeometry = new CylinderGeometry(0.1, 0.1, 0.05, 16, 1);
+  const fastenerGeometry = new CylinderGeometry(0.07, 0.07, 0.05, 16, 1);
   fastenerGeometry.rotateX(Math.PI / 2);
   const fastenerMaterial = new MeshStandardMaterial({
     color: new Color().setRGB(0.1, 0.15, 0.1),
   });
   const pipe1 = new PipeFeature({
-    profile: createRoundProfile(0.07, 16),
+    profile: createRoundProfile(0.05, 16),
     isLeft: false,
     offset: new Vector2(-1, 0.7),
     variants: {
@@ -193,20 +194,36 @@ export function createTunnelStyle() {
   });
 
   const pipe2 = new PipeFeature({
-    profile: createRoundProfile(0.07, 16),
+    profile: createRoundProfile(0.05, 16),
     isLeft: false,
     offset: new Vector2(-0.95, 0.85),
     variants: {
       detailed: {
         resolution: 2.5,
         material: pipeMaterial,
-        fastener: { geometry: fastenerGeometry, material: fastenerMaterial, resolution: 0.5 },
+        fastener: { geometry: fastenerGeometry, material: fastenerMaterial, resolution: 1 },
       },
       medium: {
         resolution: 0.5,
         material: pipeMaterial,
       },
     },
+  });
+
+  const fireExit = new FireExitFeature({
+    variants: {
+      detailed: {
+        entrance: {
+          profile: [new Vector2(0.7, 0), new Vector2(0.7, 1), new Vector2(-0.7, 1), new Vector2(-0.7, 0)],
+          material: new MeshStandardMaterial({ color: new Color().setRGB(0.5, 0.5, 0.5), side: BackSide, map: concreteTexture }),
+        },
+        roomInstance: createFireExit(),
+      },
+    },
+    entranceDepth: 1.75,
+    entranceOffset: new Vector2(0.55, 0.2),
+    roomOffset: new Vector2(3.65, 0.1),
+    range: { startU: 0.1, endU: 0.9 },
   });
 
   return new TunnelStyle({
@@ -217,7 +234,7 @@ export function createTunnelStyle() {
       { id: "low", distance: 100 },
     ],
     segmentFeatures: [shell, floor, rails, sleepers, lights, pipe1, pipe2],
-    tunnelFeatures: [walkingPath],
+    tunnelFeatures: [walkingPath, fireExit],
   });
 }
 

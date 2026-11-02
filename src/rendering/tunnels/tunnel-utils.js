@@ -89,7 +89,7 @@ export function createGeometryAlongCurve(profile, resolution, curve, tube = fals
   if (startU >= endU) throw new Error("startU can't be greater of equal to endU");
 
   const curvePartLength = curve.getLength() * (endU - startU);
-  const numberOfProfiles = Math.ceil(resolution * curvePartLength) + 1;
+  const numberOfProfiles = resolution === 0 ? 2 : Math.ceil(resolution * curvePartLength) + 1;
 
   const geometry = new BufferGeometry();
   const positionAttribute = [];
@@ -135,11 +135,11 @@ export function createGeometryAlongCurve(profile, resolution, curve, tube = fals
     const lastProfileOffset = profile.length * (numberOfProfiles - 1);
     for (let polygon of sealIndex) {
       if (sealedStart) {
-        index.push(polygon[0], polygon[1], polygon[2]);
+        index.push(polygon[0], polygon[2], polygon[1]);
       }
 
       if (sealedEnd) {
-        index.push(polygon[0] + lastProfileOffset, polygon[2] + lastProfileOffset, polygon[1] + lastProfileOffset);
+        index.push(polygon[0] + lastProfileOffset, polygon[1] + lastProfileOffset, polygon[2] + lastProfileOffset);
       }
     }
   }
@@ -161,7 +161,7 @@ export function createGeometryAlongCurve(profile, resolution, curve, tube = fals
  * @param {Curve} curve
  * @returns {{point: Vector3, tangent: Vector3, side: Vector3, localUp: Vector3}} side - vector perpendicular to tangent, local and global 'up' vectors, is considered 'x' axis; localUp - considered 'y' axis; tangent - considered 'z' axis; point - point on curve, (0, 0, 0) in this space
  */
-function getCurveFrame(u, curve) {
+export function getCurveFrame(u, curve) {
   const point = curve.getPointAt(u);
 
   // tangent, localUp and side are basis used to transform local coordinate of point according to the curve
@@ -204,7 +204,7 @@ export function getProfileGlobalPoints(localPoints, u, curve) {
  * @returns {InstancedMesh} created instances
  */
 export function createInstancesAlongCurve(profilePoint, geometry, material, resolution, curve, startU = 0, endU = 1) {
-  const matrices = getMatrixesAlongCurve(profilePoint, resolution, curve, startU, endU);
+  const matrices = getMatricesAlongCurve(profilePoint, resolution, curve, startU, endU);
   const mesh = new InstancedMesh(geometry, material, matrices.length);
 
   for (let i = 0; i < matrices.length; i++) {
@@ -223,7 +223,7 @@ export function createInstancesAlongCurve(profilePoint, geometry, material, reso
  * @param {number} endU
  * @returns {Matrix4[]} matrices
  */
-export function getMatrixesAlongCurve(profilePoint, resolution, curve, startU = 0, endU = 1) {
+export function getMatricesAlongCurve(profilePoint, resolution, curve, startU = 0, endU = 1) {
   const count = Math.ceil(curve.getLength() * (endU - startU) * resolution);
   const matrices = [];
 

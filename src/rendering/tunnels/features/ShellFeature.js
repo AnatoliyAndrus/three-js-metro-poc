@@ -15,13 +15,32 @@ export class ShellFeature extends Feature {
    * @param {Curve} curve
    * @param {string} lodLevel
    * @param {object} options
-   * @returns {Mesh} feature object
+   * @returns {Mesh}
    */
   buildSegment(curve, lodLevel, options = {}) {
     const variant = this.getVariant(lodLevel);
     if (!variant) return null;
 
     const geometry = this.#createGeometry(curve, lodLevel, options);
+
+    if (options.sideCutters?.length > 0) {
+      const evaluator = new Evaluator();
+
+      let shell = new Brush(geometry, variant.material);
+      for (let cutterInfo of options.sideCutters) {
+        for (let { matrix } of cutterInfo.points) {
+          matrix.decompose(cutterInfo.cutter.position, cutterInfo.cutter.quaternion, cutterInfo.cutter.scale);
+          cutterInfo.cutter.updateMatrix();
+          cutterInfo.cutter.updateMatrixWorld(true);
+
+          const temp = evaluator.evaluate(shell, cutterInfo.cutter, HOLLOW_SUBTRACTION);
+          shell.geometry.dispose();
+
+          shell.geometry = temp.geometry;
+        }
+      }
+      return shell;
+    }
 
     return new Mesh(geometry, variant.material);
   }

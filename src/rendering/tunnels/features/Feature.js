@@ -33,7 +33,7 @@ export class Feature {
    * @returns {Object3D}
    */
   buildSegment(curve, lodLevel, options) {
-    throw new Error("Method buildSegment must be implemented in user class");
+    throw new Error(`Method buildSegment must be implemented in feature ${this.name || ""}`);
   }
 
   /**
@@ -44,6 +44,6 @@ export class Feature {
    * @returns {Object3D}
    */
   buildJunction(curve, lodLevel, options) {
-    throw new Error("Method buildJunction must be implemented in user class");
+    throw new Error(`Method buildJunction must be implemented in feature ${this.name || ""}`);
   }
 }

@@ -1,6 +1,7 @@
-import { Curve, Object3D, Group, Mesh } from "three";
-import { createGeometryAlongCurve, createInstancesAlongCurve } from "../tunnel-utils";
+import { Curve, Object3D, Group, Mesh, Matrix4, Vector3 } from "three";
+import { createGeometryAlongCurve, createInstancesAlongCurve, isPointInsideMesh } from "../tunnel-utils";
 import { Feature } from "./Feature";
+import { Evaluator, SUBTRACTION, Brush } from "three-bvh-csg";
 
 /**
  */
@@ -29,11 +30,48 @@ export class PipeFeature extends Feature {
 
     const group = new Group();
 
+    let fasteners;
     if (variant.fastener) {
-      group.add(createInstancesAlongCurve(this.offset, variant.fastener.geometry, variant.fastener.material, variant.fastener.resolution, curve, options.startU ?? 0, options.endU ?? 1));
+      fasteners = createInstancesAlongCurve(this.offset, variant.fastener.geometry, variant.fastener.material, variant.fastener.resolution, curve, options.startU ?? 0, options.endU ?? 1);
+      group.add(fasteners);
     }
 
-    const pipe = new Mesh(createGeometryAlongCurve(this.profile, variant.resolution, curve, true, true, true, options.startU ?? 0, options.endU ?? 1), variant.material);
+    const geometry = createGeometryAlongCurve(this.profile, variant.resolution, curve, true, true, true, options.startU ?? 0, options.endU ?? 1);
+
+    let pipe;
+    if (options.sideCutters?.length > 0) {
+      const evaluator = new Evaluator();
+
+      pipe = new Brush(geometry, variant.material);
+      for (let cutterInfo of options.sideCutters) {
+        for (let { matrix } of cutterInfo.points) {
+          matrix.decompose(cutterInfo.cutter.position, cutterInfo.cutter.quaternion, cutterInfo.cutter.scale);
+          cutterInfo.cutter.updateMatrix();
+          cutterInfo.cutter.updateMatrixWorld(true);
+
+          const temp = evaluator.evaluate(pipe, cutterInfo.cutter, SUBTRACTION);
+          pipe.geometry.dispose();
+          pipe.geometry = temp.geometry;
+
+          if (fasteners) {
+            for (let i = 0; i < fasteners.count; i++) {
+              const instanceMatrix = new Matrix4();
+              fasteners.getMatrixAt(i, instanceMatrix);
+              let position = new Vector3(instanceMatrix.elements[12], instanceMatrix.elements[13], instanceMatrix.elements[14]);
+              if (isPointInsideMesh(position, cutterInfo.cutter)) {
+                instanceMatrix.makeScale(0, 0, 0);
+                fasteners.setMatrixAt(i, instanceMatrix);
+                fasteners.instanceMatrix.needsUpdate = true;
+              }
+            }
+          }
+        }
+      }
+      group.add(pipe);
+      return group;
+    }
+
+    pipe = new Mesh(geometry, variant.material);
     group.add(pipe);
     return group;
   }
