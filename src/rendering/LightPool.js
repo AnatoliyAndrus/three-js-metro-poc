@@ -8,7 +8,7 @@ export class LightPool {
    * @param {Light} lightInstance
    * @param {number} initialCount how many light sources will be created initially
    */
-  constructor(lightInstance, initialCount = 10) {
+  constructor(lightInstance, initialCount = 20) {
     this.lightInstance = lightInstance;
 
     this.free = [];

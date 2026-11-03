@@ -20,7 +20,7 @@ camera.position.set(0, 0.9, 0);
 const controls = new PointerLockControls(camera, renderer.domElement);
 const clock = new Clock();
 const move = { forward: false, backward: false, left: false, right: false, up: false, down: false };
-const movementSpeed = 30;
+const movementSpeed = 10;
 
 renderer.domElement.addEventListener("click", () => controls.lock());
 controls.addEventListener("lock", () => console.info("Pointer locked. Move: WASD, look: mouse, unlock: Esc"));

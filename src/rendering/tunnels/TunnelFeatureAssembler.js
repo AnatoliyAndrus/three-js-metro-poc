@@ -38,7 +38,8 @@ export class TunnelFeatureAssembler {
           cutter: feature.createCutter(lodLevel),
           points: feature.createConnectionMatrices(curve, { startU: Math.max(0, options.startU - 0.1 * dU), endU: Math.min(1, options.endU + 0.1 * dU) }),
         };
-      });
+      })
+      .filter((feature) => feature.cutter);
 
     options.shellCutterSelf = this.shellFeature.createCutter(curve, lodLevel, { ...options, startU: Math.max(0, options.startU - 0.1 * dU), endU: Math.min(1, options.endU + 0.1 * dU) });
     options.sideCutters = sideCutters;

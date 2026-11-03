@@ -36,7 +36,7 @@ export class FireExitFeature extends SideConnectedFeature {
 
   createCutter(lodLevel) {
     const variant = this.getVariant(lodLevel);
-    if (!variant) return null;
+    if (!variant || !variant.cutterGeometry) return null;
 
     return new Brush(variant.cutterGeometry, new MeshBasicMaterial({ side: DoubleSide }));
   }
