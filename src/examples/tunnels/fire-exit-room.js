@@ -1,10 +1,10 @@
-import { BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, SphereGeometry, CylinderGeometry, Color } from "three";
+import { BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, SphereGeometry, CylinderGeometry, Color, Vector3 } from "three";
 
 /**
  * Creates a small fire-exit room. The tunnel opening is on the positive X side;
  * the closed door is on the opposite wall.
  */
-export function createFireExit() {
+export function createFireExit(rotationY = 0, scale = new Vector3(1, 1, 1)) {
   const room = new Group();
   room.name = "FireExitRoom";
 
@@ -109,7 +109,9 @@ export function createFireExit() {
   addBox("CeilingLamp", [0.26, 0.012, 0.075], [0, height - wallThickness - 0.067, 0.2], lampMaterial);
 
   const rotationRoom = new Group();
-  room.rotateY(Math.PI);
+  room.rotateY(rotationY);
+  console.log(scale);
+  room.scale.copy(scale);
   rotationRoom.add(room);
   return rotationRoom;
 }

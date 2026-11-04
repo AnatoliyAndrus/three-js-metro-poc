@@ -83,13 +83,12 @@ export function createTunnelStyle() {
   });
 
   const floor = new FloorFeature({
-    profile: [new Vector2(-1.15, 0), new Vector2(1.15, 0)],
+    profile: [new Vector2(1.15, 0), new Vector2(-1.15, 0)],
     variants: {
       detailed: {
         resolution: 2.5,
         material: new MeshStandardMaterial({
           color: new Color().setRGB(0.4, 0.4, 0.4),
-          side: BackSide,
           map: ballastTexture,
         }),
       },
@@ -147,11 +146,6 @@ export function createTunnelStyle() {
         profilePoint: new Vector2(1.08, 0.38),
         resolution: 0.2,
         casing: createLampCasing(),
-        lodLevels: [
-          { id: "near", distance: 0 },
-          { id: "middle", distance: 20 },
-          { id: "far", distance: 50 },
-        ],
       },
     },
   });

@@ -3,7 +3,7 @@ import { Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Clock } from 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { Metro } from "./src/domain/Metro";
 import { MetroRenderer } from "./src/rendering/MetroRenderer";
-import { createTunnelManager } from "./src/examples/tunnels/tunnel-style-1";
+import { createTunnelManager } from "./src/examples/tunnels/tunnel-style-2";
 
 const container = document.querySelector(".sceneContainer");
 
@@ -47,8 +47,8 @@ document.addEventListener("keyup", (event) => {
 });
 
 //light
-const light = new HemisphereLight(0xffffbb, 0x080820, 1);
-scene.add(light);
+// const light = new HemisphereLight(0xffffbb, 0x080820, 1);
+// scene.add(light);
 
 renderer.setAnimationLoop(() => {
   const delta = Math.min(clock.getDelta(), 0.05);
