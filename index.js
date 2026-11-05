@@ -47,8 +47,8 @@ document.addEventListener("keyup", (event) => {
 });
 
 //light
-// const light = new HemisphereLight(0xffffbb, 0x080820, 1);
-// scene.add(light);
+const light = new HemisphereLight(0xffffbb, 0xf5ae0a, 0.4);
+scene.add(light);
 
 renderer.setAnimationLoop(() => {
   const delta = Math.min(clock.getDelta(), 0.05);

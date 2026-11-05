@@ -62,17 +62,19 @@ export class TunnelManager {
 
     if (from.length === 1 && to.length === 2) {
       const origin = from[0].getGlobalPosition();
+      const center = getTriangleCenter(from[0].getGlobalPosition(), to[0].getGlobalPosition(), to[1].getGlobalPosition());
+
       const firstLeft = isLeft(to[1].localPosition, from[0].localPosition, to[0].localPosition);
       const config1 = {
         to: to[0],
         from: from[0],
-        curve: new OffsetCurve(createCurve(to[0].getGlobalPosition(), to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), origin.clone().negate()),
+        curve: new OffsetCurve(createCurve(to[0].getGlobalPosition(), to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), center.clone().negate()),
         isLeft: firstLeft,
       };
       const config2 = {
         to: to[1],
         from: from[0],
-        curve: new OffsetCurve(createCurve(to[1].getGlobalPosition(), to[1].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), origin.clone().negate()),
+        curve: new OffsetCurve(createCurve(to[1].getGlobalPosition(), to[1].getGlobalDirection(), from[0].getGlobalDirection().negate(), origin, 0.3), center.clone().negate()),
         isLeft: !firstLeft,
       };
       return [config1, config2];
@@ -80,17 +82,18 @@ export class TunnelManager {
 
     if (from.length === 2 && to.length === 1) {
       const origin = to[0].getGlobalPosition();
+      const center = getTriangleCenter(from[0].getGlobalPosition(), from[1].getGlobalPosition(), to[0].getGlobalPosition());
       const firstLeft = isLeft(to[0].localPosition, from[1].localPosition, from[0].localPosition);
       const config1 = {
         to: to[0],
         from: from[0],
-        curve: new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), from[0].getGlobalPosition(), 0.3), origin.clone().negate()),
+        curve: new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[0].getGlobalDirection().negate(), from[0].getGlobalPosition(), 0.3), center.clone().negate()),
         isLeft: firstLeft,
       };
       const config2 = {
         to: to[0],
         from: from[1],
-        curve: new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[1].getGlobalDirection().negate(), from[1].getGlobalPosition(), 0.3), origin.clone().negate()),
+        curve: new OffsetCurve(createCurve(origin, to[0].getGlobalDirection(), from[1].getGlobalDirection().negate(), from[1].getGlobalPosition(), 0.3), center.clone().negate()),
         isLeft: !firstLeft,
       };
       return [config1, config2];
@@ -111,4 +114,12 @@ function isLeft(a, b, c) {
   const cross = (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
 
   return cross < 0;
+}
+
+function getTriangleCenter(a, b, c) {
+  return a
+    .clone()
+    .add(b)
+    .add(c)
+    .multiplyScalar(1 / 3);
 }

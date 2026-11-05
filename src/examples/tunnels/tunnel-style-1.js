@@ -141,6 +141,7 @@ export function createTunnelStyle() {
 
   const lights = new LightsFeature({
     lightPool: new LightPool(lightInstance),
+    lightRenderDistance: 20,
     variants: {
       detailed: {
         profilePoint: new Vector2(1.08, 0.38),

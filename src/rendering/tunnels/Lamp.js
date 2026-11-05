@@ -18,7 +18,7 @@ export class Lamp extends LOD {
    * @param {Group} casing
    * @param {LightPool} lightPool
    */
-  constructor(casing, lightPool) {
+  constructor(casing, lightPool, lightRenderDistance = 40) {
     super();
     this.casing = casing;
     this.lightPool = lightPool;
@@ -31,7 +31,7 @@ export class Lamp extends LOD {
 
     const mid = new Group();
     mid.add(casing.clone());
-    this.addLevel(mid, 20);
+    this.addLevel(mid, lightRenderDistance);
   }
 
   update(camera) {

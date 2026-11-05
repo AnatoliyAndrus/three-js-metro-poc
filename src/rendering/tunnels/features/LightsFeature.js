@@ -9,9 +9,10 @@ export class LightsFeature extends Feature {
   //light variant stores profilePoint, resolution, casing, light
   name = "lights";
 
-  constructor({ variants, lightPool }) {
+  constructor({ variants, lightPool, lightRenderDistance }) {
     super({ variants });
     this.lightPool = lightPool;
+    this.lightRenderDistance = lightRenderDistance;
   }
 
   buildSegment(curve, lodLevel, options) {
@@ -22,7 +23,7 @@ export class LightsFeature extends Feature {
     const lamps = new Group();
 
     for (const matrix of matrices) {
-      const lamp = new Lamp(variant.casing, this.lightPool);
+      const lamp = new Lamp(variant.casing, this.lightPool, this.lightRenderDistance);
       matrix.decompose(lamp.position, lamp.quaternion, lamp.scale);
       lamp.updateMatrix();
 
@@ -57,7 +58,7 @@ export class LightsFeature extends Feature {
     const lamps = new Group();
 
     for (const matrix of matrices) {
-      const lamp = new Lamp(variant.casing, this.lightPool);
+      const lamp = new Lamp(variant.casing, this.lightPool, this.lightRenderDistance);
       matrix.decompose(lamp.position, lamp.quaternion, lamp.scale);
       lamp.updateMatrix();
 

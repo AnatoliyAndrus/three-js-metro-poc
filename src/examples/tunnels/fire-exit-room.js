@@ -110,7 +110,7 @@ export function createFireExit(rotationY = 0, scale = new Vector3(1, 1, 1)) {
 
   const rotationRoom = new Group();
   room.rotateY(rotationY);
-  console.log(scale);
+
   room.scale.copy(scale);
   rotationRoom.add(room);
   return rotationRoom;
