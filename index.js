@@ -16,7 +16,7 @@ const height = container.clientHeight;
 renderer.setSize(width, height);
 container.append(canvas);
 const camera = new PerspectiveCamera(60, width / height, 0.1, 10_000);
-camera.position.set(0, 0.9, 0);
+camera.position.set(95, 3, 10);
 const controls = new PointerLockControls(camera, renderer.domElement);
 const clock = new Clock();
 const move = { forward: false, backward: false, left: false, right: false, up: false, down: false };

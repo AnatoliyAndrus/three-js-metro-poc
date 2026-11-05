@@ -206,42 +206,42 @@ export function createTunnelStyle() {
     },
   });
 
-  const fireExit = new FireExitFeature({
-    variants: {
-      detailed: {
-        entrance: {
-          profile: [new Vector2(1, 0), new Vector2(1, 1), new Vector2(-1, 1), new Vector2(-1, 0)],
-          material: new MeshStandardMaterial({ color: new Color().setRGB(0.5, 0.5, 0.5), side: BackSide, map: concreteTexture }),
-        },
-        roomInstance: createFireExit(),
-      },
-    },
-    entranceDepth: 1.2,
-    entranceOffset: new Vector2(0.55, 0.2),
-    roomOffset: new Vector2(3.1, 0.1),
-    range: { startU: 0.1, endU: 0.9 },
-  });
+  // const fireExit = new FireExitFeature({
+  //   variants: {
+  //     detailed: {
+  //       entrance: {
+  //         profile: [new Vector2(1, 0), new Vector2(1, 1), new Vector2(-1, 1), new Vector2(-1, 0)],
+  //         material: new MeshStandardMaterial({ color: new Color().setRGB(0.5, 0.5, 0.5), side: BackSide, map: concreteTexture }),
+  //       },
+  //       roomInstance: createFireExit(Math.PI),
+  //     },
+  //   },
+  //   entranceDepth: 1.2,
+  //   entranceOffset: new Vector2(0.55, 0.2),
+  //   roomOffset: new Vector2(3.1, 0.1),
+  //   range: { startU: 0.1, endU: 0.9 },
+  // });
 
-  const verticalVentilation = new VerticalVentilationFeature({
-    variants: {
-      detailed: {
-        shaft: {
-          profile: createRoundProfile(0.5, 16),
-          resolution: 1,
-          material: new MeshStandardMaterial({ color: 0x969696, side: BackSide, map: concreteTexture }),
-        },
-        fan: {
-          scale: 0.2,
-          material: new MeshStandardMaterial({ color: 0xcfcfcf, metalness: 0.3, roughness: 0.5 }),
-        },
-      },
-    },
-    range: { startU: 0.2, endU: 1 },
-    spacing: 70,
-    minLength: 50,
-    shaftHeight: 7,
-    shaftOffset: new Vector2(0, 1),
-  });
+  // const verticalVentilation = new VerticalVentilationFeature({
+  //   variants: {
+  //     detailed: {
+  //       shaft: {
+  //         profile: createRoundProfile(0.5, 16),
+  //         resolution: 1,
+  //         material: new MeshStandardMaterial({ color: 0x969696, side: BackSide, map: concreteTexture }),
+  //       },
+  //       fan: {
+  //         scale: 0.2,
+  //         material: new MeshStandardMaterial({ color: 0xcfcfcf, metalness: 0.3, roughness: 0.5 }),
+  //       },
+  //     },
+  //   },
+  //   range: { startU: 0.2, endU: 1 },
+  //   spacing: 70,
+  //   minLength: 50,
+  //   shaftHeight: 7,
+  //   shaftOffset: new Vector2(0, 1),
+  // });
 
   return new TunnelStyle({
     segmentLength: 25,
@@ -251,7 +251,7 @@ export function createTunnelStyle() {
       { id: "low", distance: 100 },
     ],
     segmentFeatures: [shell, floor, rails, sleepers, lights, pipe1, pipe2],
-    tunnelFeatures: [walkingPath, fireExit, verticalVentilation],
+    tunnelFeatures: [walkingPath /* fireExit, verticalVentilation */],
   });
 }
 
