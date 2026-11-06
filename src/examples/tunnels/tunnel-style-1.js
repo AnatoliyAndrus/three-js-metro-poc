@@ -16,7 +16,7 @@ import {
 } from "three";
 import { TunnelManager } from "../../rendering/tunnels/TunnelManager";
 import { TunnelStyle } from "../../rendering/tunnels/TunnelStyle";
-import { ShellFeature } from "../../rendering/tunnels/features/ShellFeature";
+import { ShellFeature } from "../../rendering/tunnels/features/shells/ShellFeature";
 import { FloorFeature } from "../../rendering/tunnels/features/FloorFeature";
 import { WalkingPathFeature } from "../../rendering/tunnels/features/WalkingPathFeature";
 import { RailsFeature } from "../../rendering/tunnels/features/RailsFeature";
@@ -27,6 +27,8 @@ import { PipeFeature } from "../../rendering/tunnels/features/PipeFeature";
 import { FireExitFeature } from "../../rendering/tunnels/features/FireExitFeature";
 import { createFireExit } from "./fire-exit-room";
 import { VerticalVentilationFeature } from "../../rendering/tunnels/features/VerticalVentilationFeature";
+import { SymmetricShellFeature } from "../../rendering/tunnels/features/shells/SymmetricShellFeature";
+import { NoiseShellFeature } from "../../rendering/tunnels/features/shells/NoiseShellFeature";
 
 /** Example style with one set of features providing all LOD variants. */
 export function createTunnelStyle() {
@@ -41,10 +43,17 @@ export function createTunnelStyle() {
   concreteTexture.wrapT = RepeatWrapping;
   concreteTexture.repeat.set(0.5, 0.5);
 
-  const shell = new ShellFeature({
+  const roughConcreteTexture = loader.load("../resources/textures/rough-concrete.jpg");
+  roughConcreteTexture.wrapS = RepeatWrapping;
+  roughConcreteTexture.wrapT = RepeatWrapping;
+  roughConcreteTexture.repeat.set(0.5, 0.5);
+
+  const shell = new NoiseShellFeature({
+    amplitude: 0.3,
+    frequency: 1,
     variants: {
       detailed: {
-        profile: [
+        halfProfile: [
           new Vector2(1.15, 0),
           new Vector2(1.15, 0.18),
           new Vector2(1.15, 0.38),
@@ -60,11 +69,11 @@ export function createTunnelStyle() {
         material: new MeshStandardMaterial({
           color: new Color().setRGB(0.3, 0.3, 0.5),
           side: BackSide,
-          map: concreteTexture,
+          map: roughConcreteTexture,
         }),
       },
       medium: {
-        profile: [new Vector2(1.15, 0), new Vector2(1.15, 0.35), new Vector2(1.05, 0.72), new Vector2(0.78, 1.02), new Vector2(0.4, 1.25), new Vector2(0, 1.32)],
+        halfProfile: [new Vector2(1.15, 0), new Vector2(1.15, 0.35), new Vector2(1.05, 0.72), new Vector2(0.78, 1.02), new Vector2(0.4, 1.25), new Vector2(0, 1.32)],
         resolution: 1.25,
         material: new MeshStandardMaterial({
           color: new Color().setRGB(0.3, 0.3, 0.5),
@@ -72,7 +81,7 @@ export function createTunnelStyle() {
         }),
       },
       low: {
-        profile: [new Vector2(1.15, 0), new Vector2(1.15, 0.48), new Vector2(0.92, 0.88), new Vector2(0.52, 1.2), new Vector2(0, 1.32)],
+        halfProfile: [new Vector2(1.15, 0), new Vector2(1.15, 0.48), new Vector2(0.92, 0.88), new Vector2(0.52, 1.2), new Vector2(0, 1.32)],
         resolution: 0.6,
         material: new MeshStandardMaterial({
           color: new Color().setRGB(0.3, 0.3, 0.5),
@@ -144,7 +153,7 @@ export function createTunnelStyle() {
     lightRenderDistance: 20,
     variants: {
       detailed: {
-        profilePoint: new Vector2(1.08, 0.38),
+        profilePoint: new Vector2(1.0, 0.38),
         resolution: 0.2,
         casing: createLampCasing(),
       },

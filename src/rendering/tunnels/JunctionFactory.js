@@ -1,5 +1,5 @@
 import { Curve, Group } from "three";
-import { ShellFeature } from "./features/ShellFeature";
+import { SymmetricShellFeature } from "./features/shells/SymmetricShellFeature";
 import { TunnelFeatureAssembler } from "./TunnelFeatureAssembler";
 
 export class JunctionFactory {

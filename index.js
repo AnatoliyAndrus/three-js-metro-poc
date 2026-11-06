@@ -3,7 +3,7 @@ import { Scene, WebGLRenderer, PerspectiveCamera, HemisphereLight, Clock } from 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { Metro } from "./src/domain/Metro";
 import { MetroRenderer } from "./src/rendering/MetroRenderer";
-import { createTunnelManager } from "./src/examples/tunnels/tunnel-style-2";
+import { createTunnelManager } from "./src/examples/tunnels/tunnel-style-1";
 
 const container = document.querySelector(".sceneContainer");
 

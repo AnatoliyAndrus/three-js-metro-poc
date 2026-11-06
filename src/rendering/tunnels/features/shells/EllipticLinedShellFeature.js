@@ -1,9 +1,9 @@
 import { EllipseCurve, Vector2, Vector3, DoubleSide, Curve, Mesh, ExtrudeGeometry, Shape, MeshBasicMaterial, Group } from "three/src/Three.Core.js";
-import { ShellFeature } from "./ShellFeature";
-import { createGeometryAlongCurve, getMatricesAlongCurve } from "../tunnel-utils";
+import { SymmetricShellFeature } from "./SymmetricShellFeature";
+import { createGeometryAlongCurve, getMatricesAlongCurve } from "../../tunnel-utils";
 import { Brush, Evaluator, HOLLOW_SUBTRACTION, SUBTRACTION } from "three-bvh-csg";
 
-export class EllipticLinedShellFeature extends ShellFeature {
+export class EllipticLinedShellFeature extends SymmetricShellFeature {
   constructor({ variants, xRadius = 1, yRadius = 1, floorOffset = 0 }) {
     super({ variants });
 

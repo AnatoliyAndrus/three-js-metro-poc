@@ -14,7 +14,7 @@ import {
   Vector2,
   Vector3,
 } from "three";
-import { EllipticLinedShellFeature } from "../../rendering/tunnels/features/EllipticLinedShellFeature";
+import { EllipticLinedShellFeature } from "../../rendering/tunnels/features/shells/EllipticLinedShellFeature";
 import { TunnelStyle } from "../../rendering/tunnels/TunnelStyle";
 import { LightsFeature } from "../../rendering/tunnels/features/LightsFeature";
 import { LightPool } from "../../rendering/LightPool";
@@ -285,11 +285,12 @@ function createSleeperGeometry() {
   return geometry;
 }
 
-function createRoundProfile(radius, numberOfPoints) {
+function createRoundProfile(radius, numberOfPoints, startAngle = 0, endAngle = Math.PI * 2) {
+  if (numberOfPoints === 1) return [new Vector2(Math.cos(startAngle) * radius, Math.sin(startAngle) * radius)];
   const points = [];
 
   for (let i = 0; i < numberOfPoints; i++) {
-    const angle = (i * Math.PI * 2) / numberOfPoints;
+    const angle = (i * (endAngle - startAngle)) / (numberOfPoints - 1) + startAngle;
     points.push(new Vector2(Math.cos(angle) * radius, Math.sin(angle) * radius));
   }
   return points;

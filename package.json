@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "js": "^0.1.0",
+    "noisejs": "^2.1.0",
     "three": "^0.186.1",
     "three-bvh-csg": "^0.0.18",
     "three-orbitcontrols": "^2.110.2",

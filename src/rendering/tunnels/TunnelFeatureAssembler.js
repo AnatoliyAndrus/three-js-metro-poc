@@ -1,7 +1,7 @@
 import { Curve } from "three";
 import { Segment } from "./Segment";
 import { TunnelStyle } from "./TunnelStyle";
-import { ShellFeature } from "./features/ShellFeature";
+import { SymmetricShellFeature } from "./features/shells/SymmetricShellFeature";
 
 export class TunnelFeatureAssembler {
   /**
@@ -11,7 +11,7 @@ export class TunnelFeatureAssembler {
     this.style = style;
 
     this.shellFeature = this.style.segmentFeatures.find((feature) => feature.name === "shell");
-    if (!this.shellFeature || !(this.shellFeature instanceof ShellFeature)) {
+    if (!this.shellFeature || !(this.shellFeature instanceof SymmetricShellFeature)) {
       throw new Error("Tunnel style requires a shell feature");
     }
   }
